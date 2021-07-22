@@ -1705,7 +1705,7 @@ grpc_error_handle ClientChannel::DoPingLocked(grpc_transport_op* op) {
       result.result,
       // Complete pick.
       [op](const LoadBalancingPolicy::PickResult::Complete& complete_pick)
-          ABSL_EXCLUSIVE_LOCKS_REQUIRED(&ClientChannel::work_serializer_) {
+          ABSL_NO_THREAD_SAFETY_ANALYSIS {
             SubchannelWrapper* subchannel =
                 static_cast<SubchannelWrapper*>(complete_pick.subchannel.get());
             ConnectedSubchannel* connected_subchannel =
