@@ -1503,8 +1503,8 @@ void RlsLb::RlsRequest::StartCallLocked() {
   call_ = grpc_channel_create_pollset_set_call(
       rls_channel_->channel(), nullptr, GRPC_PROPAGATE_DEFAULTS,
       lb_policy_->interested_parties(),
-      grpc_slice_from_static_string(kRlsRequestPath), nullptr,
-      deadline_, nullptr);
+      grpc_slice_from_static_string(kRlsRequestPath), nullptr, deadline_,
+      nullptr);
   grpc_op ops[6];
   memset(ops, 0, sizeof(ops));
   grpc_op* op = ops;
@@ -1673,9 +1673,9 @@ void RlsLb::UpdateLocked(UpdateArgs args) {
     config_ = args.config;
     if (old_config == nullptr ||
         config_->lookup_service() != old_config->lookup_service()) {
-      rls_channel_ = MakeRefCounted<RlsChannel>(
-          Ref(DEBUG_LOCATION, "RlsChannel"), config_->lookup_service(),
-          channel_args_);
+      rls_channel_ =
+          MakeRefCounted<RlsChannel>(Ref(DEBUG_LOCATION, "RlsChannel"),
+                                     config_->lookup_service(), channel_args_);
     }
     if (old_config == nullptr ||
         config_->cache_size_bytes() != old_config->cache_size_bytes()) {
@@ -1783,12 +1783,12 @@ void RlsLb::UpdatePicker() {
   // Run via the ExecCtx, since the caller may be holding the lock, and
   // we don't want to be doing that when we hop into the WorkSerializer,
   // in case the WorkSerializer callback happens to run inline.
-  ExecCtx::Run(DEBUG_LOCATION,
-               GRPC_CLOSURE_CREATE(
-                   UpdatePickerCallback,
-                   Ref(DEBUG_LOCATION, "UpdatePickerCallback").release(),
-                   grpc_schedule_on_exec_ctx),
-               GRPC_ERROR_NONE);
+  ExecCtx::Run(
+      DEBUG_LOCATION,
+      GRPC_CLOSURE_CREATE(UpdatePickerCallback,
+                          Ref(DEBUG_LOCATION, "UpdatePickerCallback").release(),
+                          grpc_schedule_on_exec_ctx),
+      GRPC_ERROR_NONE);
 }
 
 void RlsLb::UpdatePickerCallback(void* arg, grpc_error_handle error) {
