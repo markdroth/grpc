@@ -49,9 +49,9 @@
 
 #include "src/core/ext/filters/client_channel/client_channel.h"
 #include "src/core/ext/filters/client_channel/lb_policy.h"
+#include "src/core/ext/filters/client_channel/lb_policy/child_policy_handler.h"
 #include "src/core/ext/filters/client_channel/lb_policy_factory.h"
 #include "src/core/ext/filters/client_channel/lb_policy_registry.h"
-#include "src/core/ext/filters/client_channel/lb_policy/child_policy_handler.h"
 #include "src/core/ext/filters/client_channel/resolver_registry.h"
 #include "src/core/ext/upb-generated/src/proto/grpc/lookup/v1/rls.upb.h"
 #include "src/core/lib/backoff/backoff.h"
@@ -599,7 +599,6 @@ class RlsLb : public LoadBalancingPolicy {
   RefCountedPtr<ChildPolicyWrapper> default_child_policy_;
   ChildPolicyMap child_policy_map_;
 };
-
 
 //
 // RlsLb::Picker
