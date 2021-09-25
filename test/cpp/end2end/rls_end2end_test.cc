@@ -14,10 +14,10 @@
 // limitations under the License.
 //
 
-// TODO: add tests:
+// TODO(unknown): add tests:
 // - cache eviction via cleanup timer (based on age)
 
-// TODO: make safe for IPv6
+// TODO(unknown): make safe for IPv6
 
 #include <deque>
 #include <map>
@@ -26,6 +26,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "absl/memory/memory.h"
 #include "absl/strings/str_format.h"
 #include "absl/strings/str_join.h"
 #include "absl/types/optional.h"
@@ -231,7 +232,7 @@ class FakeResolverResponseGeneratorWrapper {
                             grpc_core::FakeResolverResponseGenerator>()) {}
 
   FakeResolverResponseGeneratorWrapper(
-      FakeResolverResponseGeneratorWrapper&& other) {
+      FakeResolverResponseGeneratorWrapper&& other) noexcept {
     response_generator_ = std::move(other.response_generator_);
   }
 
@@ -277,10 +278,10 @@ class RlsEnd2endTest : public ::testing::Test {
   static void TearDownTestCase() { grpc_shutdown_blocking(); }
 
   void SetUp() override {
-    rls_server_.reset(new ServerThread<RlsServiceImpl>("rls"));
+    rls_server_ = absl::make_unique<ServerThread<RlsServiceImpl>>("rls");
     rls_server_->Start(kServerHost);
-    resolver_response_generator_.reset(
-        new FakeResolverResponseGeneratorWrapper());
+    resolver_response_generator_ =
+        absl::make_unique<FakeResolverResponseGeneratorWrapper>();
     ChannelArguments args;
     args.SetPointer(GRPC_ARG_FAKE_RESOLVER_RESPONSE_GENERATOR,
                     resolver_response_generator_->Get());
@@ -413,7 +414,7 @@ class RlsEnd2endTest : public ::testing::Test {
     }
 
     ServiceConfigBuilder& AddKeyBuilder(absl::string_view key_builder) {
-      key_builders_.push_back(absl::StrCat("{", std::move(key_builder), "}"));
+      key_builders_.push_back(absl::StrCat("{", key_builder, "}"));
       return *this;
     }
 
@@ -509,8 +510,8 @@ class RlsEnd2endTest : public ::testing::Test {
       // by ServerThread::Serve from firing before the wait below is hit.
       grpc::internal::MutexLock lock(&mu);
       grpc::internal::CondVar cond;
-      thread_.reset(new std::thread(
-          std::bind(&ServerThread::Serve, this, server_host, &mu, &cond)));
+      thread_ = absl::make_unique<std::thread>(
+          std::bind(&ServerThread::Serve, this, server_host, &mu, &cond));
       cond.Wait(&mu);
       gpr_log(GPR_INFO, "%s server startup complete", type_.c_str());
     }
