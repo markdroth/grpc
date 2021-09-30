@@ -53,7 +53,6 @@
 #include "src/core/ext/filters/client_channel/lb_policy_factory.h"
 #include "src/core/ext/filters/client_channel/lb_policy_registry.h"
 #include "src/core/ext/filters/client_channel/resolver_registry.h"
-#include "src/proto/grpc/lookup/v1/rls.upb.h"
 #include "src/core/lib/backoff/backoff.h"
 #include "src/core/lib/gprpp/dual_ref_counted.h"
 #include "src/core/lib/gprpp/orphanable.h"
@@ -70,6 +69,7 @@
 #include "src/core/lib/transport/error_utils.h"
 #include "src/core/lib/transport/static_metadata.h"
 #include "src/core/lib/uri/uri_parser.h"
+#include "src/proto/grpc/lookup/v1/rls.upb.h"
 
 namespace grpc_core {
 
