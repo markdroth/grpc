@@ -136,7 +136,7 @@ class XdsClient::ChannelState::AdsCallState
   bool seen_response() const { return seen_response_; }
 
   void SubscribeLocked(const std::string& type_url,
-                       const XdsApi::ResourceName& resource)
+                       const XdsApi::ResourceName& name)
       ABSL_EXCLUSIVE_LOCKS_REQUIRED(&XdsClient::mu_);
   void UnsubscribeLocked(const std::string& type_url,
                          const XdsApi::ResourceName& resource,
