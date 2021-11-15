@@ -64,9 +64,9 @@ class BinderResolverTest : public ::testing::Test {
     explicit ResultHandler(const std::string& expected_binder_id)
         : expect_result_(true), expected_binder_id_(expected_binder_id) {}
 
-    void ReturnResult(grpc_core::Resolver::Result result) override {
+    void ReturnResult(grpc_core::Resolver::Result result) {
       EXPECT_TRUE(expect_result_);
-      ASSERT_TRUE(result.addresses.size() == 1);
+      ASSERT_TRUE(result.addresses->size() == 1);
       grpc_core::ServerAddress addr = result.addresses[0];
       const struct sockaddr_un* un =
           reinterpret_cast<const struct sockaddr_un*>(addr.address().addr);
@@ -76,9 +76,7 @@ class BinderResolverTest : public ::testing::Test {
       EXPECT_EQ(un->sun_path, expected_binder_id_);
     }
 
-    void ReturnError(grpc_error_handle error) override {
-      GRPC_ERROR_UNREF(error);
-    }
+    void ReturnError(grpc_error_handle error) { GRPC_ERROR_UNREF(error); }
 
    private:
     // Whether we expect ReturnResult function to be invoked
