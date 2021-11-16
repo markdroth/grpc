@@ -519,7 +519,7 @@ TEST(ChannelzServerTest, BasicServerAPIFunctionality) {
   ExecCtx exec_ctx;
   ServerFixture server(10);
   ServerNode* channelz_server =
-      grpc_core::Server::FromC(server.server())->channelz_node();
+      Server::FromC(server.server())->channelz_node();
   channelz_server->RecordCallStarted();
   channelz_server->RecordCallFailed();
   channelz_server->RecordCallSucceeded();
