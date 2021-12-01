@@ -692,8 +692,7 @@ class XdsEnd2endTest : public ::testing::TestWithParam<TestType> {
   class ServerThread {
    public:
     explicit ServerThread(XdsEnd2endTest* test_obj)
-        : test_obj_(test_obj),
-          port_(grpc_pick_unused_port_or_die()) {}
+        : test_obj_(test_obj), port_(grpc_pick_unused_port_or_die()) {}
 
     virtual ~ServerThread() { Shutdown(); }
 
@@ -951,11 +950,11 @@ class XdsEnd2endTest : public ::testing::TestWithParam<TestType> {
   // servers (and using more ports) than we actually need.  When we have
   // time, change each test to directly start the number of backends that it
   // needs, so that we aren't wasting resources.
-  XdsEnd2endTest(size_t num_backends,
-                 int client_load_reporting_interval_seconds = 100,
-                 int xds_resource_does_not_exist_timeout_ms = 0,
-                 bool use_xds_enabled_server = false,
-                 const char* lb_expected_authority = nullptr)
+  explicit XdsEnd2endTest(size_t num_backends,
+                          int client_load_reporting_interval_seconds = 100,
+                          int xds_resource_does_not_exist_timeout_ms = 0,
+                          bool use_xds_enabled_server = false,
+                          const char* lb_expected_authority = nullptr)
       : num_backends_(num_backends),
         client_load_reporting_interval_seconds_(
             client_load_reporting_interval_seconds),
