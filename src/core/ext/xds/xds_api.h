@@ -176,7 +176,7 @@ class XdsApi {
   const XdsBootstrap::Node* node_;  // Do not own.
   const CertificateProviderStore::PluginDefinitionMap*
       certificate_provider_definition_map_;  // Do not own.
-  upb::SymbolTable* symtab_;  // Do not own.
+  upb::SymbolTable* symtab_;                 // Do not own.
   const std::string build_version_;
   const std::string user_agent_name_;
   const std::string user_agent_version_;
