@@ -130,7 +130,8 @@ class XdsEndpointResourceType
   }
 
  private:
-  friend class XdsResourceTypeImpl<XdsEndpointResourceType, XdsEndpointResource>;
+  friend class XdsResourceTypeImpl<XdsEndpointResourceType,
+                                   XdsEndpointResource>;
   XdsEndpointResourceType() {
     XdsResourceTypeRegistry::GetOrCreate()->RegisterType(this);
   }
