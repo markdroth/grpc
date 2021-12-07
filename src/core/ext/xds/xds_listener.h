@@ -215,7 +215,8 @@ class XdsListenerResourceType
   }
 
  private:
-  friend class XdsResourceTypeImpl<XdsListenerResourceType, XdsListenerResource>;
+  friend class XdsResourceTypeImpl<XdsListenerResourceType,
+                                   XdsListenerResource>;
   XdsListenerResourceType() {
     XdsResourceTypeRegistry::GetOrCreate()->RegisterType(this);
   }
