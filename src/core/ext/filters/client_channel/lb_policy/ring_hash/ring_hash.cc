@@ -151,7 +151,7 @@ class RingHash : public LoadBalancingPolicy {
     // after we have started watching.
     void ProcessConnectivityChangeLocked(
         absl::optional<grpc_connectivity_state> old_state,
-        grpc_connectivity_state new_state);
+        grpc_connectivity_state new_state) override;
 
     ServerAddress address_;
     std::atomic<grpc_connectivity_state> connectivity_state_{GRPC_CHANNEL_IDLE};
