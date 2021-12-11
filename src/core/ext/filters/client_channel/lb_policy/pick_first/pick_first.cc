@@ -210,7 +210,7 @@ void PickFirst::AttemptToConnectUsingLatestUpdateArgsLocked() {
     return;
   }
   // Start watching connectivity state of all subchannels.
-// FIXME: do this in SubchannelList ctor?
+  // FIXME: do this in SubchannelList ctor?
   for (size_t i = 0; i < subchannel_list->num_subchannels(); ++i) {
     subchannel_list->subchannel(i)->StartConnectivityWatchLocked();
   }
