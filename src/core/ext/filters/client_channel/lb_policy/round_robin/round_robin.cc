@@ -413,8 +413,8 @@ void RoundRobin::UpdateLocked(UpdateArgs args) {
         absl::make_unique<TransientFailurePicker>(status));
     if (GRPC_TRACE_FLAG_ENABLED(grpc_lb_round_robin_trace) &&
         subchannel_list_ != nullptr) {
-      gpr_log(GPR_INFO, "[RR %p] Shutting down previous subchannel list %p", this,
-              subchannel_list_.get());
+      gpr_log(GPR_INFO, "[RR %p] Shutting down previous subchannel list %p",
+              this, subchannel_list_.get());
     }
     subchannel_list_ = std::move(latest_pending_subchannel_list_);
   } else if (subchannel_list_ == nullptr) {
