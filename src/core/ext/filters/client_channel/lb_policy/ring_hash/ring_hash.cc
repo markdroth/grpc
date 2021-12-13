@@ -718,7 +718,8 @@ void RingHash::UpdateLocked(UpdateArgs args) {
     // Send up the initial picker while all subchannels are in IDLE state.
     channel_control_helper()->UpdateState(
         GRPC_CHANNEL_READY, absl::Status(),
-        absl::make_unique<Picker>(Ref(DEBUG_LOCATION, "RingHashPicker"), ring_));
+        absl::make_unique<Picker>(Ref(DEBUG_LOCATION, "RingHashPicker"),
+                                  ring_));
   }
 }
 

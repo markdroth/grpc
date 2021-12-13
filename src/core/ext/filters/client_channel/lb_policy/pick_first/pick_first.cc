@@ -203,7 +203,8 @@ void PickFirst::AttemptToConnectUsingLatestUpdateArgsLocked() {
   latest_pending_subchannel_list_ = MakeOrphanable<PickFirstSubchannelList>(
       this, &grpc_lb_pick_first_trace, std::move(addresses),
       *latest_update_args_.args);
-  // Empty update or no valid subchannels.  Put the channel in TRANSIENT_FAILURE.
+  // Empty update or no valid subchannels.  Put the channel in
+  // TRANSIENT_FAILURE.
   if (latest_pending_subchannel_list_->num_subchannels() == 0) {
     absl::Status status =
         latest_update_args_.addresses.ok()
@@ -221,8 +222,8 @@ void PickFirst::AttemptToConnectUsingLatestUpdateArgsLocked() {
     selected_ = nullptr;
     if (GRPC_TRACE_FLAG_ENABLED(grpc_lb_pick_first_trace) &&
         subchannel_list_ != nullptr) {
-      gpr_log(GPR_INFO, "[PF %p] Shutting down previous subchannel list %p", this,
-              subchannel_list_.get());
+      gpr_log(GPR_INFO, "[PF %p] Shutting down previous subchannel list %p",
+              this, subchannel_list_.get());
     }
     subchannel_list_ = std::move(latest_pending_subchannel_list_);
   }
