@@ -216,20 +216,19 @@ TEST(URIParserTest, InvalidURIsResultInFailureStatuses) {
 }
 
 TEST(URIParserTest, PercentEncodePath) {
-  EXPECT_EQ(
-      grpc_core::URI::PercentEncodePath(
-          // These chars are allowed.
-          "abcdefghijklmnopqrstuvwxyz"
-          "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-          "0123456789"
-          "/:@-._~!$&'()*+,;="
-          // These chars will be escaped.
-          "\\?%#[]^"),
-      "abcdefghijklmnopqrstuvwxyz"
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-      "0123456789"
-      "/:@-._~!$&'()*+,;="
-      "%5c%3f%25%23%5b%5d%5e");
+  EXPECT_EQ(grpc_core::URI::PercentEncodePath(
+                // These chars are allowed.
+                "abcdefghijklmnopqrstuvwxyz"
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                "0123456789"
+                "/:@-._~!$&'()*+,;="
+                // These chars will be escaped.
+                "\\?%#[]^"),
+            "abcdefghijklmnopqrstuvwxyz"
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "0123456789"
+            "/:@-._~!$&'()*+,;="
+            "%5c%3f%25%23%5b%5d%5e");
 }
 
 int main(int argc, char** argv) {

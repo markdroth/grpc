@@ -738,7 +738,8 @@ void XdsResolver::StartLocked() {
                                    "/envoy.config.listener.v3.Listener/%s");
     }
     lds_resource_name_ = absl::StrReplaceAll(
-        name_template, {{"%s", URI::PercentEncodePath(resource_name_fragment)}});
+        name_template,
+        {{"%s", URI::PercentEncodePath(resource_name_fragment)}});
   } else {
     // target_uri.authority not set
     absl::string_view name_template =
