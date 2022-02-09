@@ -127,10 +127,10 @@ static void test_retry_transparent_max_concurrent_streams(
   gpr_timespec deadline = five_seconds_from_now();
 
   // Client starts a call.
-  grpc_call* c = grpc_channel_create_call(
-      f.client, nullptr, GRPC_PROPAGATE_DEFAULTS, f.cq,
-      grpc_slice_from_static_string("/service/method"),
-      nullptr, deadline, nullptr);
+  grpc_call* c =
+      grpc_channel_create_call(f.client, nullptr, GRPC_PROPAGATE_DEFAULTS, f.cq,
+                               grpc_slice_from_static_string("/service/method"),
+                               nullptr, deadline, nullptr);
   GPR_ASSERT(c);
   grpc_metadata_array initial_metadata_recv;
   grpc_metadata_array_init(&initial_metadata_recv);
@@ -184,10 +184,10 @@ static void test_retry_transparent_max_concurrent_streams(
   // Client starts a second call.
   // We set wait_for_ready for this call, so that if it retries before
   // the server comes back up, it stays pending.
-  grpc_call* c2 = grpc_channel_create_call(
-      f.client, nullptr, GRPC_PROPAGATE_DEFAULTS, f.cq,
-      grpc_slice_from_static_string("/service/method"),
-      nullptr, deadline, nullptr);
+  grpc_call* c2 =
+      grpc_channel_create_call(f.client, nullptr, GRPC_PROPAGATE_DEFAULTS, f.cq,
+                               grpc_slice_from_static_string("/service/method"),
+                               nullptr, deadline, nullptr);
   GPR_ASSERT(c2);
   grpc_metadata_array initial_metadata_recv2;
   grpc_metadata_array_init(&initial_metadata_recv2);
