@@ -17,6 +17,7 @@
 #include <grpc/support/port_platform.h>
 
 #include "src/core/ext/filters/client_channel/lb_policy/oob_backend_metric.h"
+
 #include "src/core/ext/filters/client_channel/subchannel.h"
 
 namespace grpc_core {
@@ -44,9 +45,7 @@ class OrcaProducer : public Subchannel::DataProducerInterface {
     watcher_map_[watcher.get()] = std::move(watcher);
   }
 
-  void RemoveWatcher(OrcaWatcher* watcher) {
-    watcher_map_.erase(watcher);
-  }
+  void RemoveWatcher(OrcaWatcher* watcher) { watcher_map_.erase(watcher); }
 
  private:
   RefCountedPtr<Subchannel> subchannel_;
@@ -68,9 +67,8 @@ class OrcaWatcher : public SubchannelInterface::DataWatcherInterface {
 
   // When the client channel sees this wrapper, it will pass it the real
   // subchannel and the WorkSerializer to use.
-  void SetSubchannel(
-      Subchannel* subchannel,
-      std::shared_ptr<WorkSerializer> work_serializer) override {
+  void SetSubchannel(Subchannel* subchannel,
+                     std::shared_ptr<WorkSerializer> work_serializer) override {
     // Check if our producer is already registered with the subchannel.
     // If not, create a new one, which will register itself with the subchannel.
     auto* p =
