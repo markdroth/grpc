@@ -2510,8 +2510,8 @@ grpc_cc_library(
         "time",
         "uri_parser",
         "useful",
-        "xds_orca_upb",
         "xds_orca_service_upb",
+        "xds_orca_upb",
     ],
 )
 
