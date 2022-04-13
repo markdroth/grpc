@@ -138,8 +138,7 @@ class CdsLb : public LoadBalancingPolicy {
 
   absl::StatusOr<bool> GenerateDiscoveryMechanismForCluster(
       const std::string& name, std::set<std::string> clusters_in_current_path,
-      Json::Array* discovery_mechanisms,
-      std::set<std::string>* clusters_added);
+      Json::Array* discovery_mechanisms, std::set<std::string>* clusters_added);
   void OnClusterChanged(const std::string& name,
                         XdsClusterResource cluster_data);
   void OnError(const std::string& name, absl::Status status);
