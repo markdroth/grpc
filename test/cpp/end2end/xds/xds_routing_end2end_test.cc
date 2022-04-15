@@ -30,8 +30,8 @@ namespace grpc {
 namespace testing {
 namespace {
 
-using std::chrono::system_clock;
 using ::envoy::extensions::filters::http::fault::v3::HTTPFault;
+using std::chrono::system_clock;
 
 using LdsTest = XdsEnd2endTest;
 
