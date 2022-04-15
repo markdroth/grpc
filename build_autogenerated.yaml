@@ -8381,9 +8381,9 @@ targets:
 - name: xds_cluster_type_end2end_test
   gtest: true
   build: test
-  run: false
   language: c++
   headers:
+  - test/cpp/end2end/connection_delay_injector.h
   - test/cpp/end2end/counted_service.h
   - test/cpp/end2end/test_service_impl.h
   - test/cpp/end2end/xds/xds_end2end_test_lib.h
@@ -8422,6 +8422,7 @@ targets:
   - src/proto/grpc/testing/xds/v3/route.proto
   - src/proto/grpc/testing/xds/v3/router.proto
   - src/proto/grpc/testing/xds/v3/string.proto
+  - test/cpp/end2end/connection_delay_injector.cc
   - test/cpp/end2end/test_service_impl.cc
   - test/cpp/end2end/xds/xds_cluster_type_end2end_test.cc
   - test/cpp/end2end/xds/xds_end2end_test_lib.cc
