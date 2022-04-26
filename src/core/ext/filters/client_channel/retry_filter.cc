@@ -1330,8 +1330,9 @@ RetryFilter::CallData::CallAttempt::BatchData::~BatchData() {
             call_attempt_->calld_->chand_, call_attempt_->calld_,
             call_attempt_.get(), this);
   }
-  GRPC_CALL_STACK_UNREF(call_attempt_->calld_->owning_call_, "Retry BatchData");
+  auto* owning_call = call_attempt_->calld_->owning_call_;
   call_attempt_.reset(DEBUG_LOCATION, "~BatchData");
+  GRPC_CALL_STACK_UNREF(owning_call, "Retry BatchData");
 }
 
 void RetryFilter::CallData::CallAttempt::BatchData::
@@ -1693,8 +1694,6 @@ void RetryFilter::CallData::CallAttempt::BatchData::RunClosuresForCompletedCall(
 
 void RetryFilter::CallData::CallAttempt::BatchData::RecvTrailingMetadataReady(
     void* arg, grpc_error_handle error) {
-  RefCountedPtr<grpc_call_stack> owning_call_stack =
-      static_cast<BatchData*>(arg)->call_attempt_->calld_->owning_call_->Ref();
   RefCountedPtr<BatchData> batch_data(static_cast<BatchData*>(arg));
   CallAttempt* call_attempt = batch_data->call_attempt_.get();
   CallData* calld = call_attempt->calld_;
