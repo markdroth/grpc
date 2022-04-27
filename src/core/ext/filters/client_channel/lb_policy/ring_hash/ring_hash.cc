@@ -656,8 +656,7 @@ void RingHash::RingHashSubchannelData::ProcessConnectivityChangeLocked(
     }
     p->channel_control_helper()->RequestReresolution();
   }
-  const bool connection_attempt_complete =
-      new_state != GRPC_CHANNEL_CONNECTING;
+  const bool connection_attempt_complete = new_state != GRPC_CHANNEL_CONNECTING;
   // Decide what state to report for the purposes of aggregation and
   // picker behavior.
   // If the last recorded state was TRANSIENT_FAILURE, ignore the update
@@ -747,8 +746,8 @@ void RingHash::UpdateLocked(UpdateArgs args) {
     // Build the ring.
     ring_ = subchannel_list_->MakeRing();
     // Send up the new picker.
-// FIXME: this may cause a slight latency bump while we wait for the
-// initial connectivity state reports for the subchannels in the new list
+    // FIXME: this may cause a slight latency bump while we wait for the
+    // initial connectivity state reports for the subchannels in the new list
     channel_control_helper()->UpdateState(
         GRPC_CHANNEL_READY, absl::Status(),
         absl::make_unique<Picker>(Ref(DEBUG_LOCATION, "RingHashPicker"),
