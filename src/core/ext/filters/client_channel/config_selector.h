@@ -21,6 +21,7 @@
 
 #include <string.h>
 
+#include <memory>
 #include <utility>
 #include <vector>
 
