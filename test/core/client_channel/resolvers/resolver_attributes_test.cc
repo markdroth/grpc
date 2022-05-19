@@ -205,9 +205,11 @@ TEST(ResolverAttributeMapTest, ToString) {
   map.Set(absl::make_unique<StringAttribute>("foo"));
   // Entries may be in either order depending on where the strings happen
   // to be allocated.
-  EXPECT_THAT(map.ToString(), ::testing::AnyOf(
-      "{integer_attribute={value=3}, string_attribute={value=foo}}",
-      "{string_attribute={value=foo}, integer_attribute={value=3}}"));
+  EXPECT_THAT(
+      map.ToString(),
+      ::testing::AnyOf(
+          "{integer_attribute={value=3}, string_attribute={value=foo}}",
+          "{string_attribute={value=foo}, integer_attribute={value=3}}"));
 }
 
 TEST(ResolverAttributeMapTest, Compare) {
