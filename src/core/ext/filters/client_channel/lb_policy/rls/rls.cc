@@ -1197,12 +1197,12 @@ LoadBalancingPolicy::PickResult RlsLb::Cache::Entry::Pick(PickArgs args) {
   for (; i < child_policy_wrappers_.size(); ++i) {
     child_policy_wrapper = child_policy_wrappers_[i].get();
     if (child_policy_wrapper->connectivity_state() ==
-        GRPC_CHANNEL_TRANSIENT_FAILURE &&
+            GRPC_CHANNEL_TRANSIENT_FAILURE &&
         i < child_policy_wrappers_.size() - 1) {
       if (GRPC_TRACE_FLAG_ENABLED(grpc_lb_rls_trace)) {
         gpr_log(GPR_INFO,
-                "[rlslb %p] cache entry=%p %s: target %s (%" PRIuPTR " of %"
-                PRIuPTR ") in state TRANSIENT_FAILURE; skipping",
+                "[rlslb %p] cache entry=%p %s: target %s (%" PRIuPTR
+                " of %" PRIuPTR ") in state TRANSIENT_FAILURE; skipping",
                 lb_policy_.get(), this, lru_iterator_->ToString().c_str(),
                 child_policy_wrapper->target().c_str(), i,
                 child_policy_wrappers_.size());
@@ -1214,8 +1214,8 @@ LoadBalancingPolicy::PickResult RlsLb::Cache::Entry::Pick(PickArgs args) {
   // the list, so delegate.
   if (GRPC_TRACE_FLAG_ENABLED(grpc_lb_rls_trace)) {
     gpr_log(GPR_INFO,
-            "[rlslb %p] cache entry=%p %s: target %s (%" PRIuPTR " of %"
-            PRIuPTR ") in state %s; delegating",
+            "[rlslb %p] cache entry=%p %s: target %s (%" PRIuPTR " of %" PRIuPTR
+            ") in state %s; delegating",
             lb_policy_.get(), this, lru_iterator_->ToString().c_str(),
             child_policy_wrapper->target().c_str(), i,
             child_policy_wrappers_.size(),
