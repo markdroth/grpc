@@ -39,7 +39,6 @@
 #include <algorithm>
 #include <unordered_map>
 
-#include <grpc/grpc.h>
 #include <grpc/slice.h>
 #include <grpc/support/alloc.h>
 #include <grpc/support/log.h>
@@ -358,19 +357,10 @@ using grpc_core::TcpZerocopySendCtx;
 using grpc_core::TcpZerocopySendRecord;
 
 namespace {
-// Keep grpc initialized whilst there are TCP connections.
-// This should not get ported to EventEngine!
-class KeepGrpcInitializedForTCP {
- public:
-  KeepGrpcInitializedForTCP() { grpc_init(); }
-  ~KeepGrpcInitializedForTCP() { grpc_shutdown(); }
-};
-
 struct grpc_tcp {
   grpc_tcp(int max_sends, size_t send_bytes_threshold)
       : tcp_zerocopy_send_ctx(max_sends, send_bytes_threshold) {}
   grpc_endpoint base;
-  GPR_NO_UNIQUE_ADDRESS KeepGrpcInitializedForTCP grpc_init_keep_alive;
   grpc_fd* em_fd;
   int fd;
   /* Used by the endpoint read function to distinguish the very first read call
@@ -899,7 +889,7 @@ static void tcp_handle_read(void* arg /* grpc_tcp */, grpc_error_handle error) {
   }
   tcp->read_mu.Lock();
   grpc_error_handle tcp_read_error;
-  if (GPR_LIKELY(error == GRPC_ERROR_NONE)) {
+  if (GPR_LIKELY(GRPC_ERROR_IS_NONE(error))) {
     maybe_make_read_slices(tcp);
     if (!tcp_do_read(tcp, &tcp_read_error)) {
       /* We've consumed the edge, request a new one */
@@ -1241,7 +1231,7 @@ static void tcp_handle_error(void* arg /* grpc_tcp */,
             grpc_error_std_string(error).c_str());
   }
 
-  if (error != GRPC_ERROR_NONE ||
+  if (!GRPC_ERROR_IS_NONE(error) ||
       static_cast<bool>(gpr_atm_acq_load(&tcp->stop_error_notification))) {
     /* We aren't going to register to hear on error anymore, so it is safe to
      * unref. */
@@ -1547,7 +1537,7 @@ static void tcp_handle_write(void* arg /* grpc_tcp */,
   grpc_tcp* tcp = static_cast<grpc_tcp*>(arg);
   grpc_closure* cb;
 
-  if (error != GRPC_ERROR_NONE) {
+  if (!GRPC_ERROR_IS_NONE(error)) {
     cb = tcp->write_cb;
     tcp->write_cb = nullptr;
     if (tcp->current_zerocopy_send != nullptr) {
@@ -1570,7 +1560,7 @@ static void tcp_handle_write(void* arg /* grpc_tcp */,
     }
     notify_on_write(tcp);
     // tcp_flush does not populate error if it has returned false.
-    GPR_DEBUG_ASSERT(error == GRPC_ERROR_NONE);
+    GPR_DEBUG_ASSERT(GRPC_ERROR_IS_NONE(error));
   } else {
     cb = tcp->write_cb;
     tcp->write_cb = nullptr;
