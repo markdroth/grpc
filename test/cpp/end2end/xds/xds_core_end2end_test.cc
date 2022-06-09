@@ -395,20 +395,20 @@ INSTANTIATE_TEST_SUITE_P(
 
 TEST_P(TimeoutTest, LdsServerIgnoresRequest) {
   balancer_->ads_service()->IgnoreResourceType(kLdsTypeUrl);
-  CheckRpcSendFailure(DEBUG_LOCATION, StatusCode::UNAVAILABLE,
-                      // TODO(roth): Improve this error as part of
-                      // https://github.com/grpc/grpc/issues/22883.
-                      "empty address list: ",
-                      RpcOptions().set_timeout_ms(4000));
+  CheckRpcSendFailure(
+      DEBUG_LOCATION, StatusCode::UNAVAILABLE,
+      // TODO(roth): Improve this error as part of
+      // https://github.com/grpc/grpc/issues/22883.
+      "empty address list: ", RpcOptions().set_timeout_ms(4000));
 }
 
 TEST_P(TimeoutTest, LdsResourceNotPresentInRequest) {
   balancer_->ads_service()->UnsetResource(kLdsTypeUrl, kServerName);
-  CheckRpcSendFailure(DEBUG_LOCATION, StatusCode::UNAVAILABLE,
-                      // TODO(roth): Improve this error as part of
-                      // https://github.com/grpc/grpc/issues/22883.
-                      "empty address list: ",
-                      RpcOptions().set_timeout_ms(4000));
+  CheckRpcSendFailure(
+      DEBUG_LOCATION, StatusCode::UNAVAILABLE,
+      // TODO(roth): Improve this error as part of
+      // https://github.com/grpc/grpc/issues/22883.
+      "empty address list: ", RpcOptions().set_timeout_ms(4000));
 }
 
 TEST_P(TimeoutTest, LdsSecondResourceNotPresentInRequest) {
@@ -445,8 +445,7 @@ TEST_P(TimeoutTest, RdsServerIgnoresRequest) {
       DEBUG_LOCATION, StatusCode::UNAVAILABLE,
       // TODO(roth): Improve this error as part of
       // https://github.com/grpc/grpc/issues/22883.
-      "empty address list: ",
-      RpcOptions().set_timeout_ms(4000));
+      "empty address list: ", RpcOptions().set_timeout_ms(4000));
 }
 
 TEST_P(TimeoutTest, RdsResourceNotPresentInRequest) {
@@ -456,8 +455,7 @@ TEST_P(TimeoutTest, RdsResourceNotPresentInRequest) {
       DEBUG_LOCATION, StatusCode::UNAVAILABLE,
       // TODO(roth): Improve this error as part of
       // https://github.com/grpc/grpc/issues/22883.
-      "empty address list: ",
-      RpcOptions().set_timeout_ms(4000));
+      "empty address list: ", RpcOptions().set_timeout_ms(4000));
 }
 
 TEST_P(TimeoutTest, RdsSecondResourceNotPresentInRequest) {
@@ -546,23 +544,21 @@ TEST_P(TimeoutTest, CdsSecondResourceNotPresentInRequest) {
 
 TEST_P(TimeoutTest, EdsServerIgnoresRequest) {
   balancer_->ads_service()->IgnoreResourceType(kEdsTypeUrl);
-  CheckRpcSendFailure(
-      DEBUG_LOCATION, StatusCode::UNAVAILABLE,
-      // TODO(roth): Improve this error message as part of
-      // https://github.com/grpc/grpc/issues/22883.
-      "no children in weighted_target policy: ",
-      RpcOptions().set_timeout_ms(4000));
+  CheckRpcSendFailure(DEBUG_LOCATION, StatusCode::UNAVAILABLE,
+                      // TODO(roth): Improve this error message as part of
+                      // https://github.com/grpc/grpc/issues/22883.
+                      "no children in weighted_target policy: ",
+                      RpcOptions().set_timeout_ms(4000));
 }
 
 TEST_P(TimeoutTest, EdsResourceNotPresentInRequest) {
   // No need to remove EDS resource, since the test suite does not add it
   // by default.
-  CheckRpcSendFailure(
-      DEBUG_LOCATION, StatusCode::UNAVAILABLE,
-      // TODO(roth): Improve this error message as part of
-      // https://github.com/grpc/grpc/issues/22883.
-      "no children in weighted_target policy: ",
-      RpcOptions().set_timeout_ms(4000));
+  CheckRpcSendFailure(DEBUG_LOCATION, StatusCode::UNAVAILABLE,
+                      // TODO(roth): Improve this error message as part of
+                      // https://github.com/grpc/grpc/issues/22883.
+                      "no children in weighted_target policy: ",
+                      RpcOptions().set_timeout_ms(4000));
 }
 
 TEST_P(TimeoutTest, EdsSecondResourceNotPresentInRequest) {
