@@ -338,6 +338,14 @@ void WeightedTargetLb::UpdateLocked(UpdateArgs args) {
     target->UpdateLocked(config, std::move(addresses), args.args);
   }
   update_in_progress_ = false;
+  if (config_->target_map().empty()) {
+    absl::Status status = absl::UnavailableError(absl::StrCat(
+        "no children in weighted_target policy: ", args.resolution_note));
+    channel_control_helper()->UpdateState(
+        GRPC_CHANNEL_TRANSIENT_FAILURE, status,
+        absl::make_unique<TransientFailurePicker>(status));
+    return;
+  }
   UpdateStateLocked();
 }
 
