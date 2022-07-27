@@ -127,7 +127,8 @@ TEST(JsonObjectLoaderTest, LoadTestStruct1) {
               "field:a error:does not exist; "
               "field:b error:is not a number; "
               "field:c error:failed to parse number; "
-              "field:x error:is not a string]") << s.status();
+              "field:x error:is not a string]")
+        << s.status();
   }
 }
 
@@ -163,8 +164,8 @@ TEST(JsonObjectLoaderTest, LoadTestStruct2) {
     EXPECT_EQ(s->c.x, "foo");
   }
   {
-    auto s = Parse<TestStruct2>(
-        "{\"a\":[{\"a\":7, \"x\":\"bar\"}],\"b\":[1,2,3]}");
+    auto s =
+        Parse<TestStruct2>("{\"a\":[{\"a\":7, \"x\":\"bar\"}],\"b\":[1,2,3]}");
     ASSERT_TRUE(s.ok()) << s.status();
     EXPECT_EQ(s->a.size(), 1);
     EXPECT_EQ(s->a[0].a, 7);
@@ -184,7 +185,8 @@ TEST(JsonObjectLoaderTest, LoadTestStruct2) {
               "errors validating JSON: ["
               "field:a[0].a error:failed to parse number; "
               "field:b[1] error:is not a number; "
-              "field:c error:is not an object]") << s.status();
+              "field:c error:is not an object]")
+        << s.status();
   }
 }
 

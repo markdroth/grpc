@@ -21,6 +21,7 @@
 #include <cstring>
 #include <map>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include "absl/meta/type_traits.h"
@@ -292,7 +293,7 @@ struct Element {
   // Is this field optional?
   bool optional;
   // The name of the field.
-  const char *name;
+  const char* name;
 };
 
 // Vec<T, kSize> provides a constant array type that can be appended to by
