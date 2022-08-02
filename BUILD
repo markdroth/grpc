@@ -3360,7 +3360,7 @@ grpc_cc_library(
         "iomgr_fwd",
         "iomgr_timer",
         "json",
-        "json_util",
+        "json_object_loader",
         "memory_quota",
         "orphanable",
         "protobuf_duration_upb",

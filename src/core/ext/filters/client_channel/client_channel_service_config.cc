@@ -18,11 +18,8 @@
 
 #include "src/core/ext/filters/client_channel/client_channel_service_config.h"
 
-#include <ctype.h>
-
-#include <algorithm>
 #include <map>
-#include <vector>
+#include <utility>
 
 #include "absl/memory/memory.h"
 #include "absl/status/status.h"
@@ -31,11 +28,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/types/optional.h"
 
-#include <grpc/support/log.h>
-
 #include "src/core/ext/filters/client_channel/lb_policy_registry.h"
-#include "src/core/lib/iomgr/error.h"
-#include "src/core/lib/json/json_util.h"
 
 // As per the retry design, we do not allow more than 5 retry attempts.
 #define MAX_MAX_RETRY_ATTEMPTS 5
@@ -124,8 +117,8 @@ void ClientChannelGlobalParsedConfig::JsonPostLoad(const Json& json,
     bool requires_config = false;
     if (!LoadBalancingPolicyRegistry::LoadBalancingPolicyExists(
             parsed_deprecated_lb_policy_, &requires_config)) {
-      errors->AddError(absl::StrCat(
-          "unknown LB policy \"", parsed_deprecated_lb_policy_, "\""));
+      errors->AddError(absl::StrCat("unknown LB policy \"",
+                                    parsed_deprecated_lb_policy_, "\""));
     } else if (requires_config) {
       errors->AddError(absl::StrCat(
           "LB policy \"", parsed_deprecated_lb_policy_,
