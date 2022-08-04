@@ -21,10 +21,6 @@
 
 #include <grpc/support/port_platform.h>
 
-#include <atomic>
-
-#include <grpc/support/log.h>
-
 #include "src/core/lib/gprpp/mpscq.h"
 #include "src/core/lib/gprpp/sync.h"
 
