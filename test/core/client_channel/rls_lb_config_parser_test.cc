@@ -188,14 +188,13 @@ TEST_F(RlsConfigParsingTest, InvalidRlsChannelServiceConfig) {
   EXPECT_EQ(service_config.status().code(), absl::StatusCode::kInvalidArgument);
   EXPECT_THAT(
       service_config.status().message(),
-      ::testing::HasSubstr(
-          "errors validing RLS LB policy config: ["
-          "field:routeLookupChannelServiceConfig error:"
-          "INVALID_ARGUMENT:Service config parsing errors: ["
-          "errors validating JSON: ["
-          "field:loadBalancingPolicy error:"
-          "unknown LB policy \"unknown\"]]; "
-          "field:routeLookupConfig error:field not present]"))
+      ::testing::HasSubstr("errors validing RLS LB policy config: ["
+                           "field:routeLookupChannelServiceConfig error:"
+                           "INVALID_ARGUMENT:Service config parsing errors: ["
+                           "errors validating JSON: ["
+                           "field:loadBalancingPolicy error:"
+                           "unknown LB policy \"unknown\"]]; "
+                           "field:routeLookupConfig error:field not present]"))
       << service_config.status();
 }
 
