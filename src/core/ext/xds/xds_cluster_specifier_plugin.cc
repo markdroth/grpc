@@ -18,20 +18,8 @@
 
 #include "src/core/ext/xds/xds_cluster_specifier_plugin.h"
 
-#include <stddef.h>
-
-#include <algorithm>
 #include <map>
 #include <utility>
-
-#include "absl/memory/memory.h"
-#include "absl/status/status.h"
-#include "absl/strings/str_cat.h"
-#include "upb/json_encode.h"
-#include "upb/status.h"
-#include "upb/upb.hpp"
-
-#include <grpc/support/log.h>
 
 namespace grpc_core {
 
