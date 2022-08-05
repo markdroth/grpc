@@ -19,9 +19,6 @@
 
 #include <grpc/support/port_platform.h>
 
-#include <map>
-#include <memory>
-
 #include "src/core/ext/xds/xds_lb_policy_registry.h"
 
 namespace grpc_core {

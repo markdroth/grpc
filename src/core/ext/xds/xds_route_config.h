@@ -36,7 +36,6 @@
 #include "re2/re2.h"
 #include "upb/def.h"
 
-#include "src/core/ext/xds/xds_cluster_specifier_plugin.h"
 #include "src/core/ext/xds/xds_http_filters.h"
 #include "src/core/ext/xds/xds_resource_type.h"
 #include "src/core/ext/xds/xds_resource_type_impl.h"

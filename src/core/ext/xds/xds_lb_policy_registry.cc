@@ -22,19 +22,14 @@
 
 #include <string>
 #include <utility>
-#include <vector>
 
-#include "absl/memory/memory.h"
 #include "absl/status/status.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_format.h"
 #include "envoy/config/core/v3/extension.upb.h"
-#include "envoy/extensions/load_balancing_policies/ring_hash/v3/ring_hash.upb.h"
-#include "envoy/extensions/load_balancing_policies/wrr_locality/v3/wrr_locality.upb.h"
 #include "google/protobuf/any.upb.h"
 #include "google/protobuf/struct.upb.h"
 #include "google/protobuf/struct.upbdefs.h"
-#include "google/protobuf/wrappers.upb.h"
 #include "upb/arena.h"
 #include "upb/json_encode.h"
 #include "upb/status.h"
