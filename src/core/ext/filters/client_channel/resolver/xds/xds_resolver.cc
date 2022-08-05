@@ -43,6 +43,7 @@
 #include "absl/types/variant.h"
 #include "re2/re2.h"
 
+#include "src/core/ext/xds/xds_http_filters_grpc.h"
 #include "src/core/lib/gprpp/unique_type_name.h"
 
 #define XXH_INLINE_ALL

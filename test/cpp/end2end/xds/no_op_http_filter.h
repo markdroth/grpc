@@ -43,13 +43,14 @@ class NoOpHttpFilter : public grpc_core::XdsHttpFilter {
     return grpc_core::XdsHttpFilter::FilterConfig{name_, grpc_core::Json()};
   }
 
-  const grpc_channel_filter* channel_filter() const override { return nullptr; }
+  const grpc_channel_filter* channel_filter() const { return nullptr; }
 
   absl::StatusOr<grpc_core::XdsHttpFilter::ServiceConfigJsonEntry>
   GenerateServiceConfig(
       const FilterConfig& /*hcm_filter_config*/,
       const FilterConfig* /*filter_config_override*/) const override {
-    return grpc_core::XdsHttpFilter::ServiceConfigJsonEntry{name_, ""};
+    return grpc_core::XdsHttpFilter::ServiceConfigJsonEntry;
+    {name_, ""};
   }
 
   bool IsSupportedOnClients() const override { return supported_on_clients_; }
