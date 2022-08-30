@@ -38,16 +38,15 @@ class ClientAuthFilterTest : public ::testing::Test {
         : grpc_call_credentials(GRPC_SECURITY_NONE),
           status_(std::move(status)) {}
 
-    grpc_core::UniqueTypeName type() const override {
-      static grpc_core::UniqueTypeName::Factory kFactory("FailCallCreds");
+    UniqueTypeName type() const override {
+      static UniqueTypeName::Factory kFactory("FailCallCreds");
       return kFactory.Create();
     }
 
-    grpc_core::ArenaPromise<absl::StatusOr<grpc_core::ClientMetadataHandle>>
-    GetRequestMetadata(grpc_core::ClientMetadataHandle initial_metadata,
-                       const GetRequestMetadataArgs* args) override {
-      return Immediate<absl::StatusOr<grpc_core::ClientMetadataHandle>>(
-          status_);
+    ArenaPromise<absl::StatusOr<ClientMetadataHandle>> GetRequestMetadata(
+        ClientMetadataHandle initial_metadata,
+        const GetRequestMetadataArgs* args) override {
+      return Immediate<absl::StatusOr<ClientMetadataHandle>>(status_);
     }
 
     int cmp_impl(const grpc_call_credentials* other) const override {
@@ -71,8 +70,7 @@ class ClientAuthFilterTest : public ::testing::Test {
             ? nullptr
             : MakeRefCounted<FailCallCreds>(std::move(status_for_call_creds)),
         "localhost:1234", &args);
-    return args
-        .SetObject(std::move(security_connector))
+    return args.SetObject(std::move(security_connector))
         .SetObject(MakeRefCounted<grpc_auth_context>(nullptr));
   }
 
