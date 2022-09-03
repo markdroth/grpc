@@ -215,14 +215,13 @@ class XdsClientTest : public ::testing::Test {
   absl::optional<DiscoveryRequest> GetRequest(
       FakeXdsTransportFactory::FakeStreamingCall* stream,
       SourceLocation location = SourceLocation()) {
-    auto message = stream->GetMessageFromClient(
-        absl::Seconds(1) * grpc_test_slowdown_factor());
+    auto message = stream->GetMessageFromClient(absl::Seconds(1) *
+                                                grpc_test_slowdown_factor());
     if (!message.has_value()) return absl::nullopt;
     DiscoveryRequest request;
     bool success = request.ParseFromString(*message);
-    EXPECT_TRUE(success)
-        << "Failed to deserialize DiscoveryRequest at " << location.file()
-        << ":" << location.line();
+    EXPECT_TRUE(success) << "Failed to deserialize DiscoveryRequest at "
+                         << location.file() << ":" << location.line();
     if (!success) return absl::nullopt;
     return std::move(request);
   }
