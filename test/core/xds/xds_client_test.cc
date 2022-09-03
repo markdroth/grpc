@@ -162,9 +162,9 @@ class XdsClientTest : public ::testing::Test {
   };
 
   // A watcher implementation that queues delivered watches.
-// FIXME: need to change the API here such that all 3 types of events
-// are returned in a single queue, so that we can tell the order in
-// which they were received
+  // FIXME: need to change the API here such that all 3 types of events
+  // are returned in a single queue, so that we can tell the order in
+  // which they were received
   class FooWatcher : public XdsFooResourceType::WatcherInterface {
    public:
     absl::optional<XdsFooResource> WaitForNextResource(

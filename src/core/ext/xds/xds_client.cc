@@ -529,9 +529,8 @@ void XdsClient::ChannelState::OnConnectivityFailure(absl::Status status) {
 void XdsClient::ChannelState::SetChannelStatusLocked(absl::Status status) {
   if (shutting_down_) return;
   status = absl::Status(
-      status.code(),
-      absl::StrCat("xDS channel for server ", server_.server_uri, ": ",
-                   status.message()));
+      status.code(), absl::StrCat("xDS channel for server ", server_.server_uri,
+                                  ": ", status.message()));
   gpr_log(GPR_INFO, "[xds_client %p] %s", xds_client(),
           status.ToString().c_str());
   // If the node ID is set, append that to the status message that we send to
@@ -539,9 +538,8 @@ void XdsClient::ChannelState::SetChannelStatusLocked(absl::Status status) {
   const auto* node = xds_client_->bootstrap_->node();
   if (node != nullptr) {
     status = absl::Status(
-        status.code(),
-        absl::StrCat(status.message(), " (node ID:",
-                     xds_client_->bootstrap_->node()->id, ")"));
+        status.code(), absl::StrCat(status.message(), " (node ID:",
+                                    xds_client_->bootstrap_->node()->id, ")"));
   }
   // Save status in channel, so that we can immediately generate an
   // error for any new watchers that may be started.
@@ -550,9 +548,9 @@ void XdsClient::ChannelState::SetChannelStatusLocked(absl::Status status) {
   std::set<RefCountedPtr<ResourceWatcherInterface>> watchers;
   for (const auto& a : xds_client_->authority_state_map_) {  // authority
     if (a.second.channel_state != this) continue;
-    for (const auto& t : a.second.resource_map) {            // type
-      for (const auto& r : t.second) {                       // resource id
-        for (const auto& w : r.second.watchers) {            // watchers
+    for (const auto& t : a.second.resource_map) {  // type
+      for (const auto& r : t.second) {             // resource id
+        for (const auto& w : r.second.watchers) {  // watchers
           watchers.insert(w.second);
         }
       }
@@ -562,10 +560,10 @@ void XdsClient::ChannelState::SetChannelStatusLocked(absl::Status status) {
   xds_client_->work_serializer_.Schedule(
       [watchers = std::move(watchers), status = std::move(status)]()
           ABSL_EXCLUSIVE_LOCKS_REQUIRED(xds_client_->work_serializer_) {
-        for (const auto& watcher : watchers) {
-          watcher->OnError(status);
-        }
-      },
+            for (const auto& watcher : watchers) {
+              watcher->OnError(status);
+            }
+          },
       DEBUG_LOCATION);
 }
 
@@ -1489,8 +1487,8 @@ void XdsClient::WatchResource(const XdsResourceType* type,
     work_serializer_.Run(
         [watcher = std::move(watcher), status = std::move(status)]()
             ABSL_EXCLUSIVE_LOCKS_REQUIRED(&work_serializer_) {
-          watcher->OnError(status);
-        },
+              watcher->OnError(status);
+            },
         DEBUG_LOCATION);
   };
   auto resource_name = ParseXdsResourceName(name, type);
@@ -1562,15 +1560,14 @@ void XdsClient::WatchResource(const XdsResourceType* type,
       std::string details = resource_state.meta.failed_details;
       const auto* node = bootstrap_->node();
       if (node != nullptr) {
-        details = absl::StrCat(details, " (node ID:", bootstrap_->node()->id,
-                               ")");
+        absl::StrAppend(&details, " (node ID:", bootstrap_->node()->id, ")");
       }
       work_serializer_.Schedule(
           [watcher, details = std::move(details)]()
               ABSL_EXCLUSIVE_LOCKS_REQUIRED(&work_serializer_) {
-            watcher->OnError(absl::UnavailableError(absl::StrCat(
-                "invalid resource: ", details)));
-          },
+                watcher->OnError(absl::UnavailableError(
+                    absl::StrCat("invalid resource: ", details)));
+              },
           DEBUG_LOCATION);
     }
     // If the authority doesn't yet have a channel, set it, creating it if
@@ -1590,8 +1587,8 @@ void XdsClient::WatchResource(const XdsResourceType* type,
       work_serializer_.Schedule(
           [watcher = std::move(watcher), status = std::move(channel_status)]()
               ABSL_EXCLUSIVE_LOCKS_REQUIRED(&work_serializer_) mutable {
-            watcher->OnError(std::move(status));
-          },
+                watcher->OnError(std::move(status));
+              },
           DEBUG_LOCATION);
     }
     authority_state.channel_state->SubscribeLocked(type, *resource_name);
@@ -1864,12 +1861,12 @@ void XdsClient::NotifyWatchersOnErrorLocked(
                                     " (node ID:", bootstrap_->node()->id, ")"));
   }
   work_serializer_.Schedule(
-      [watchers = std::move(watchers), status = std::move(status)]()
+      [watchers = watchers, status = std::move(status)]()
           ABSL_EXCLUSIVE_LOCKS_REQUIRED(&work_serializer_) {
-        for (const auto& p : watchers) {
-          p.first->OnError(status);
-        }
-      },
+            for (const auto& p : watchers) {
+              p.first->OnError(status);
+            }
+          },
       DEBUG_LOCATION);
 }
 
@@ -1877,8 +1874,7 @@ void XdsClient::NotifyWatchersOnResourceDoesNotExist(
     const std::map<ResourceWatcherInterface*,
                    RefCountedPtr<ResourceWatcherInterface>>& watchers) {
   work_serializer_.Schedule(
-      [watchers = std::move(watchers)]()
-          ABSL_EXCLUSIVE_LOCKS_REQUIRED(&work_serializer_) {
+      [watchers = watchers]() ABSL_EXCLUSIVE_LOCKS_REQUIRED(&work_serializer_) {
         for (const auto& p : watchers) {
           p.first->OnResourceDoesNotExist();
         }
