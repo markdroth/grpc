@@ -40,10 +40,9 @@ class XdsClusterTest : public ::testing::Test {
  protected:
   XdsClusterTest()
       : xds_client_(MakeXdsClient()),
-        decode_context_{
-            xds_client_.get(), xds_client_->bootstrap().server(),
-            &xds_cluster_resource_type_test_trace, upb_def_pool_.ptr(),
-            upb_arena_.ptr()} {}
+        decode_context_{xds_client_.get(), xds_client_->bootstrap().server(),
+                        &xds_cluster_resource_type_test_trace,
+                        upb_def_pool_.ptr(), upb_arena_.ptr()} {}
 
   static RefCountedPtr<XdsClient> MakeXdsClient() {
     grpc_error_handle error = GRPC_ERROR_NONE;
@@ -563,8 +562,9 @@ TEST_F(ClusterTypeTest, AggregateClusterUnparseableProto) {
   cluster.set_name("foo");
   cluster.mutable_cluster_type()->set_name("envoy.clusters.aggregate");
   auto* any = cluster.mutable_cluster_type()->mutable_typed_config();
-  any->set_type_url("type.googleapis.com/"
-                    "envoy.extensions.clusters.aggregate.v3.ClusterConfig");
+  any->set_type_url(
+      "type.googleapis.com/"
+      "envoy.extensions.clusters.aggregate.v3.ClusterConfig");
   any->set_value(std::string("\0", 1));
   std::string serialized_resource;
   ASSERT_TRUE(cluster.SerializeToString(&serialized_resource));
@@ -575,9 +575,8 @@ TEST_F(ClusterTypeTest, AggregateClusterUnparseableProto) {
   EXPECT_EQ(*decode_result.name, "foo");
   EXPECT_EQ(decode_result.resource.status().code(),
             absl::StatusCode::kInvalidArgument);
-  EXPECT_EQ(
-      decode_result.resource.status().message(),
-      "errors parsing CDS resource: [Can't parse aggregate cluster.]")
+  EXPECT_EQ(decode_result.resource.status().message(),
+            "errors parsing CDS resource: [Can't parse aggregate cluster.]")
       << decode_result.resource.status();
 }
 
@@ -648,11 +647,10 @@ TEST_F(LbPolicyTest, LbPolicyRingHashSetMinAndMaxRingSizeToZero) {
   EXPECT_EQ(*decode_result.name, "foo");
   EXPECT_EQ(decode_result.resource.status().code(),
             absl::StatusCode::kInvalidArgument);
-  EXPECT_EQ(
-      decode_result.resource.status().message(),
-      "errors parsing CDS resource: ["
-      "max_ring_size is not in the range of 1 to 8388608.; "
-      "min_ring_size is not in the range of 1 to 8388608.]")
+  EXPECT_EQ(decode_result.resource.status().message(),
+            "errors parsing CDS resource: ["
+            "max_ring_size is not in the range of 1 to 8388608.; "
+            "min_ring_size is not in the range of 1 to 8388608.]")
       << decode_result.resource.status();
 }
 
@@ -674,11 +672,10 @@ TEST_F(LbPolicyTest, LbPolicyRingHashSetMinAndMaxRingSizeTooLarge) {
   EXPECT_EQ(*decode_result.name, "foo");
   EXPECT_EQ(decode_result.resource.status().code(),
             absl::StatusCode::kInvalidArgument);
-  EXPECT_EQ(
-      decode_result.resource.status().message(),
-      "errors parsing CDS resource: ["
-      "max_ring_size is not in the range of 1 to 8388608.; "
-      "min_ring_size is not in the range of 1 to 8388608.]")
+  EXPECT_EQ(decode_result.resource.status().message(),
+            "errors parsing CDS resource: ["
+            "max_ring_size is not in the range of 1 to 8388608.; "
+            "min_ring_size is not in the range of 1 to 8388608.]")
       << decode_result.resource.status();
 }
 
@@ -700,10 +697,9 @@ TEST_F(LbPolicyTest, LbPolicyRingHashSetMinRingSizeLargerThanMaxRingSize) {
   EXPECT_EQ(*decode_result.name, "foo");
   EXPECT_EQ(decode_result.resource.status().code(),
             absl::StatusCode::kInvalidArgument);
-  EXPECT_EQ(
-      decode_result.resource.status().message(),
-      "errors parsing CDS resource: ["
-      "min_ring_size cannot be greater than max_ring_size.]")
+  EXPECT_EQ(decode_result.resource.status().message(),
+            "errors parsing CDS resource: ["
+            "min_ring_size cannot be greater than max_ring_size.]")
       << decode_result.resource.status();
 }
 
@@ -724,10 +720,9 @@ TEST_F(LbPolicyTest, LbPolicyRingHashUnsupportedHashFunction) {
   EXPECT_EQ(*decode_result.name, "foo");
   EXPECT_EQ(decode_result.resource.status().code(),
             absl::StatusCode::kInvalidArgument);
-  EXPECT_EQ(
-      decode_result.resource.status().message(),
-      "errors parsing CDS resource: ["
-      "ring hash lb config has invalid hash function.]")
+  EXPECT_EQ(decode_result.resource.status().message(),
+            "errors parsing CDS resource: ["
+            "ring hash lb config has invalid hash function.]")
       << decode_result.resource.status();
 }
 
@@ -746,9 +741,8 @@ TEST_F(LbPolicyTest, UnsupportedPolicy) {
   EXPECT_EQ(*decode_result.name, "foo");
   EXPECT_EQ(decode_result.resource.status().code(),
             absl::StatusCode::kInvalidArgument);
-  EXPECT_EQ(
-      decode_result.resource.status().message(),
-      "errors parsing CDS resource: [LB policy is not supported.]")
+  EXPECT_EQ(decode_result.resource.status().message(),
+            "errors parsing CDS resource: [LB policy is not supported.]")
       << decode_result.resource.status();
 }
 
@@ -819,8 +813,6 @@ TEST_F(TlsConfigTest, UnknownCertificateProviderInstance) {
       "Unrecognized certificate provider instance name: fake]]")
       << decode_result.resource.status();
 }
-
-
 
 // FIXME: add tests for OD validation described in
 // https://github.com/grpc/proposal/blob/master/A50-xds-outlier-detection.md#validation
