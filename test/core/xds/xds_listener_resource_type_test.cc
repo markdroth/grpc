@@ -36,8 +36,8 @@
 #include "src/core/ext/xds/xds_bootstrap.h"
 #include "src/core/ext/xds/xds_bootstrap_grpc.h"
 #include "src/core/ext/xds/xds_client.h"
-#include "src/core/ext/xds/xds_listener.h"
 #include "src/core/ext/xds/xds_common_types.h"
+#include "src/core/ext/xds/xds_listener.h"
 #include "src/core/ext/xds/xds_resource_type.h"
 #include "src/core/lib/debug/trace.h"
 #include "src/core/lib/gprpp/ref_counted_ptr.h"
@@ -54,7 +54,8 @@
 using envoy::config::listener::v3::Listener;
 using envoy::extensions::filters::http::fault::v3::HTTPFault;
 using envoy::extensions::filters::http::router::v3::Router;
-using envoy::extensions::filters::network::http_connection_manager::v3::HttpConnectionManager;
+using envoy::extensions::filters::network::http_connection_manager::v3::
+    HttpConnectionManager;
 using envoy::extensions::transport_sockets::tls::v3::DownstreamTlsContext;
 
 namespace grpc_core {

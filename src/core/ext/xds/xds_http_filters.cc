@@ -45,8 +45,8 @@ class XdsHttpRouterFilter : public XdsHttpFilterImpl {
   }
 
   absl::optional<FilterConfig> GenerateFilterConfig(
-      XdsExtension extension, upb_Arena* arena, ValidationErrors* errors)
-      const override {
+      XdsExtension extension, upb_Arena* arena,
+      ValidationErrors* errors) const override {
     absl::string_view* serialized_filter_config =
         absl::get_if<absl::string_view>(&extension.value);
     if (serialized_filter_config == nullptr) {
