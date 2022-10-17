@@ -979,17 +979,16 @@ void XdsClient::ChannelState::AdsCallState::SendMessageLocked(
   std::string serialized_message = xds_client()->api_.CreateAdsRequest(
       chand()->server_,
       chand()->server_.ShouldUseV3() ? type->type_url() : type->v2_type_url(),
-      state.version, state.nonce,
-      ResourceNamesForRequest(type), state.status, !sent_initial_message_);
+      state.version, state.nonce, ResourceNamesForRequest(type), state.status,
+      !sent_initial_message_);
   sent_initial_message_ = true;
   if (GRPC_TRACE_FLAG_ENABLED(grpc_xds_client_trace)) {
     gpr_log(GPR_INFO,
             "[xds_client %p] xds server %s: sending ADS request: type=%s "
             "version=%s nonce=%s error=%s",
             xds_client(), chand()->server_.server_uri().c_str(),
-            std::string(type->type_url()).c_str(),
-            state.version.c_str(), state.nonce.c_str(),
-            state.status.ToString().c_str());
+            std::string(type->type_url()).c_str(), state.version.c_str(),
+            state.nonce.c_str(), state.status.ToString().c_str());
   }
   state.status = absl::OkStatus();
   call_->SendMessage(std::move(serialized_message));
