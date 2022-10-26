@@ -49,8 +49,8 @@
 #include "src/proto/grpc/testing/xds/v3/http_filter_rbac.pb.h"
 #include "src/proto/grpc/testing/xds/v3/route.pb.h"
 #include "src/proto/grpc/testing/xds/v3/typed_struct.pb.h"
-#include "test/core/util/test_config.h"
 #include "test/core/util/scoped_env_var.h"
+#include "test/core/util/test_config.h"
 
 using envoy::config::route::v3::RouteConfiguration;
 using grpc::lookup::v1::RouteLookupClusterSpecifier;
@@ -199,16 +199,15 @@ TEST_F(RlsTest, Basic) {
       static_cast<XdsRouteConfigResource&>(**decode_result.resource);
   EXPECT_THAT(
       resource.cluster_specifier_plugin_map,
-      ::testing::ElementsAre(
-          ::testing::Pair(
-              "rls",
-              "[{\"rls_experimental\":{"
-              "\"childPolicy\":[{\"cds_experimental\":{}}],"
-              "\"childPolicyConfigTargetFieldName\":\"cluster\","
-              "\"routeLookupConfig\":{"
-              "\"cacheSizeBytes\":\"1024\","
-              "\"grpcKeybuilders\":[{\"names\":[{\"service\":\"service\"}]}],"
-              "\"lookupService\":\"rls.example.com\"}}}]")));
+      ::testing::ElementsAre(::testing::Pair(
+          "rls",
+          "[{\"rls_experimental\":{"
+          "\"childPolicy\":[{\"cds_experimental\":{}}],"
+          "\"childPolicyConfigTargetFieldName\":\"cluster\","
+          "\"routeLookupConfig\":{"
+          "\"cacheSizeBytes\":\"1024\","
+          "\"grpcKeybuilders\":[{\"names\":[{\"service\":\"service\"}]}],"
+          "\"lookupService\":\"rls.example.com\"}}}]")));
   ASSERT_EQ(resource.virtual_hosts.size(), 1UL);
   EXPECT_THAT(resource.virtual_hosts[0].domains, ::testing::ElementsAre("*"));
   EXPECT_THAT(resource.virtual_hosts[0].typed_per_filter_config,
@@ -224,7 +223,7 @@ TEST_F(RlsTest, Basic) {
   ASSERT_NE(action, nullptr);
   auto* plugin_name = absl::get_if<
       XdsRouteConfigResource::Route::RouteAction::ClusterSpecifierPluginName>(
-          &action->action);
+      &action->action);
   ASSERT_NE(plugin_name, nullptr);
   EXPECT_EQ(plugin_name->cluster_specifier_plugin_name, "rls");
 }
