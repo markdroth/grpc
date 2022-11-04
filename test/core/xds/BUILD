@@ -18,7 +18,6 @@ load(
     "grpc_cc_test",
     "grpc_package",
 )
-
 load("//test/core/util:grpc_fuzzer.bzl", "grpc_proto_fuzzer")
 
 grpc_package(name = "test/core/xds")
@@ -164,6 +163,10 @@ grpc_proto_fuzzer(
     corpus = "xds_client_corpora",
     language = "C++",
     proto = "xds_client_fuzzer.proto",
+    proto_deps = [
+        "//src/proto/grpc/status:status_proto",
+        "//src/proto/grpc/testing/xds/v3:discovery_proto",
+    ],
     tags = ["no_windows"],
     uses_event_engine = False,
     uses_polling = False,
@@ -171,10 +174,6 @@ grpc_proto_fuzzer(
         ":xds_transport_fake",
         "//src/core:grpc_xds_client",
         "//test/core/util:grpc_test_util",
-    ],
-    proto_deps = [
-        "//src/proto/grpc/status:status_proto",
-        "//src/proto/grpc/testing/xds/v3:discovery_proto",
     ],
 )
 
