@@ -56,7 +56,7 @@ class Fuzzer {
     auto bootstrap = std::move(*bootstrap_or);
     // Initialize authority_state_map_.
     authority_state_map_[""].xds_server = &bootstrap->server();
-    for (const auto & p : bootstrap->authorities()) {
+    for (const auto& p : bootstrap->authorities()) {
       auto& state = authority_state_map_[p.first];
       state.xds_server = p.second.server();
       if (state.xds_server == nullptr) state.xds_server = &bootstrap->server();
@@ -67,7 +67,6 @@ class Fuzzer {
     transport_factory_ = transport_factory.get();
     xds_client_ = MakeRefCounted<XdsClient>(std::move(bootstrap),
                                             std::move(transport_factory));
-
   }
 
   void Act(const xds_client_fuzzer::Action& action) {
@@ -173,7 +172,7 @@ class Fuzzer {
     explicit Watcher(std::string resource_name)
         : resource_name_(std::move(resource_name)) {}
 
-// FIXME: check these expectations as they happen instead of all at the end?
+    // FIXME: check these expectations as they happen instead of all at the end?
     ~Watcher() override {
       auto event_queue_string = [&](const std::vector<Event>& event_queue) {
         std::vector<absl::string_view> parts;
