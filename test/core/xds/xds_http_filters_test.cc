@@ -37,11 +37,11 @@
 #include <grpc/support/log.h>
 #include <grpcpp/impl/codegen/config_protobuf.h>
 
-#include "src/core/ext/xds/xds_bootstrap_grpc.h"
 #include "src/core/ext/filters/fault_injection/fault_injection_filter.h"
 #include "src/core/ext/filters/fault_injection/fault_injection_service_config_parser.h"
 #include "src/core/ext/filters/rbac/rbac_filter.h"
 #include "src/core/ext/filters/rbac/rbac_service_config_parser.h"
+#include "src/core/ext/xds/xds_bootstrap_grpc.h"
 #include "src/proto/grpc/testing/xds/v3/address.pb.h"
 #include "src/proto/grpc/testing/xds/v3/fault.pb.h"
 #include "src/proto/grpc/testing/xds/v3/fault_common.pb.h"
@@ -75,8 +75,8 @@ using ::envoy::extensions::filters::http::router::v3::Router;
 class XdsHttpFilterTest : public ::testing::Test {
  protected:
   XdsHttpFilterTest()
-      : decode_context_{nullptr, xds_server_, nullptr,
-                        upb_def_pool_.ptr(), upb_arena_.ptr()} {}
+      : decode_context_{nullptr, xds_server_, nullptr, upb_def_pool_.ptr(),
+                        upb_arena_.ptr()} {}
 
   XdsExtension MakeXdsExtension(const grpc::protobuf::Message& message) {
     google::protobuf::Any any;
