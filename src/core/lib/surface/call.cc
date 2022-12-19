@@ -348,8 +348,7 @@ char* Call::GetPeer() {
   Slice peer_slice = PeerString();
   if (!peer_slice.empty()) {
     absl::string_view peer_string_view = peer_slice.as_string_view();
-    char* peer_string =
-        static_cast<char*>(gpr_malloc(peer_string_.size() + 1));
+    char* peer_string = static_cast<char*>(gpr_malloc(peer_string_.size() + 1));
     memcpy(peer_string, peer_string_view.data(), peer_string_view.size());
     peer_string[peer_string_view.size()] = '\0';
     return peer_string;
@@ -1035,8 +1034,8 @@ void FilterStackCall::RecvTrailingFilter(grpc_metadata_batch* b,
       if (status_code != GRPC_STATUS_OK) {
         Slice peer = PeerString();
         error = grpc_error_set_int(
-            GRPC_ERROR_CREATE(absl::StrCat(
-                "Error received from peer ", peer.as_string_view())),
+            GRPC_ERROR_CREATE(absl::StrCat("Error received from peer ",
+                                           peer.as_string_view())),
             StatusIntProperty::kRpcStatus, static_cast<intptr_t>(status_code));
       }
       auto grpc_message = b->Take(GrpcMessageMetadata());
