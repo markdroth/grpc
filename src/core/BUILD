@@ -2018,6 +2018,7 @@ grpc_cc_library(
         "lib/transport/bdp_estimator.cc",
     ],
     hdrs = ["lib/transport/bdp_estimator.h"],
+    external_deps = ["absl/strings"],
     deps = [
         "time",
         "//:gpr",
