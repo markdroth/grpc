@@ -60,6 +60,7 @@
 #include "src/core/lib/gprpp/orphanable.h"
 #include "src/core/lib/gprpp/ref_counted_ptr.h"
 #include "src/core/lib/gprpp/sync.h"
+#include "src/core/lib/gprpp/unique_type_name.h"
 #include "src/core/lib/gprpp/work_serializer.h"
 #include "src/core/lib/iomgr/exec_ctx.h"
 #include "src/core/lib/iomgr/resolved_address.h"
@@ -684,7 +685,7 @@ class LoadBalancingPolicyTest : public ::testing::Test {
   bool PicksAreRoundRobin(absl::Span<const absl::string_view> expected,
                           absl::Span<const std::string> actual) {
     absl::optional<size_t> expected_index;
-    for (auto address : actual) {
+    for (const auto& address : actual) {
       auto it = std::find(expected.begin(), expected.end(), address);
       if (it == expected.end()) return false;
       size_t index = it - expected.begin();
