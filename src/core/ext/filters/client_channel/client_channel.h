@@ -175,7 +175,7 @@ class ClientChannel {
       ConfigSelector::CallDispatchController* call_dispatch_controller,
       bool is_transparent_retry);
 
-// FIXME: do we need on_call_destruction_complete here?
+  // FIXME: do we need on_call_destruction_complete here?
   ArenaPromise<ServerMetadataHandle> CreateLoadBalancedCallPromise(
       CallArgs call_args, bool is_transparent_retry);
 
@@ -418,7 +418,7 @@ class ClientChannel::LoadBalancedCall
   };
 
   LoadBalancedCall(
-      ClientChannel* chand, 
+      ClientChannel* chand,
       ConfigSelector::CallDispatchController* call_dispatch_controller,
       bool is_transparent_retry);
   ~LoadBalancedCall() override;
@@ -460,7 +460,7 @@ class ClientChannel::LoadBalancedCall
 
   ClientChannel* chand_;
 
-// FIXME: where do we use this?  maybe just use from initial metadata batch?
+  // FIXME: where do we use this?  maybe just use from initial metadata batch?
   Slice path_;  // Request path.
   Timestamp deadline_;
 
@@ -469,7 +469,7 @@ class ClientChannel::LoadBalancedCall
 
   gpr_cycle_counter lb_call_start_time_ = gpr_get_cycle_counter();
 
-// FIXME: needed?
+  // FIXME: needed?
   grpc_closure pick_closure_;
 
   // Accessed while holding ClientChannel::data_plane_mu_.
@@ -545,7 +545,7 @@ class ClientChannel::FilterBasedLoadBalancedCall
 
   void CreateSubchannelCall();
 
-  ClientChannel* chand_;
+  class class ClientChannel* chand_;
 
   // TODO(roth): Instead of duplicating these fields in every filter
   // that uses any one of them, we should store them in the call
@@ -563,7 +563,7 @@ class ClientChannel::FilterBasedLoadBalancedCall
   // Set when we fail inside the LB call.
   grpc_error_handle failure_error_;
 
-// FIXME: needed?
+  // FIXME: needed?
   grpc_closure pick_closure_;
 
   RefCountedPtr<SubchannelCall> subchannel_call_;
