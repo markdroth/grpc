@@ -106,17 +106,15 @@ TraceFlag grpc_client_channel_lb_call_trace(false, "client_channel_lb_call");
 
 class ClientChannel::CallData {
  protected:
-// FIXME: update args (and set chand_)
+  // FIXME: update args (and set chand_)
   CallData(grpc_call_element* elem, const ClientChannel& chand,
            const grpc_call_element_args& args);
   virtual ~CallData();
 
   Poll<absl::Status> CheckResolutionLocked(ClientChannel* chand);
-      ABSL_EXCLUSIVE_LOCKS_REQUIRED(&ClientChannel::resolution_mu_);
+  ABSL_EXCLUSIVE_LOCKS_REQUIRED(&ClientChannel::resolution_mu_);
 
-  DynamicFilters* dynamic_filters() const {
-    return dynamic_filters_.get();
-  }
+  DynamicFilters* dynamic_filters() const { return dynamic_filters_.get(); }
 
  private:
   virtual void ResetDeadline(Timestamp deadline) = 0;
@@ -144,7 +142,7 @@ class ClientChannel::CallData {
 
   grpc_slice path_;  // Request path.
 
-// FIXME: remove?
+  // FIXME: remove?
   grpc_closure resolution_done_closure_;
 
   // Accessed while holding ClientChannel::resolution_mu_.
@@ -154,7 +152,7 @@ class ClientChannel::CallData {
       ABSL_GUARDED_BY(&ClientChannel::resolution_mu_) = false;
   ClientChannel::ResolverQueuedCall resolver_queued_call_
       ABSL_GUARDED_BY(&ClientChannel::resolution_mu_);
-  ResolverQueuedCallCanceller* resolver_call_canceller_
+  ResolverQueuedCall* resolver_call_canceller_
       ABSL_GUARDED_BY(&ClientChannel::resolution_mu_) = nullptr;
 
   RefCountedPtr<DynamicFilters> dynamic_filters_;
@@ -194,7 +192,7 @@ class ClientChannel::FilterBasedCallData {
 
   // Returns the index into pending_batches_ to be used for batch.
   static size_t GetBatchIndex(grpc_transport_stream_op_batch* batch);
-  void PendingBatchesAdd(grpc_call_element* elem,
+  void PendingBatchesAdd(struct grpc_call_element* elem,
                          grpc_transport_stream_op_batch* batch);
   static void FailPendingBatchInCallCombiner(void* arg,
                                              grpc_error_handle error);
@@ -215,17 +213,17 @@ class ClientChannel::FilterBasedCallData {
   // If yield_call_combiner_predicate returns true, assumes responsibility for
   // yielding the call combiner.
   void PendingBatchesFail(
-      grpc_call_element* elem, grpc_error_handle error,
+      struct grpc_call_element* elem, grpc_error_handle error,
       YieldCallCombinerPredicate yield_call_combiner_predicate);
   static void ResumePendingBatchInCallCombiner(void* arg,
                                                grpc_error_handle ignored);
   // Resumes all pending batches on lb_call_.
-  void PendingBatchesResume(grpc_call_element* elem);
+  void PendingBatchesResume(struct grpc_call_element* elem);
 
   static void RecvTrailingMetadataReadyForConfigSelectorCommitCallback(
       void* arg, grpc_error_handle error);
 
-  void CreateDynamicCall(grpc_call_element* elem);
+  void CreateDynamicCall(struct grpc_call_element* elem);
 
   // State for handling deadlines.
   // The code in deadline_filter.c requires this to be the first field.
@@ -244,7 +242,7 @@ class ClientChannel::FilterBasedCallData {
 
   grpc_polling_entity* pollent_ = nullptr;
 
-// FIXME: remove if keeping in parent class
+  // FIXME: remove if keeping in parent class
   grpc_closure resolution_done_closure_;
 
   grpc_closure* original_recv_trailing_metadata_ready_ = nullptr;
@@ -266,7 +264,7 @@ class ClientChannel::FilterBasedCallData {
 class ClientChannel::PromiseBasedCallData {
  public:
   auto MakeNameResolutionPromise() {
-    return [this]() -> Poll<absl::Status> {
+    return []() -> Poll<absl::Status> {
       MutexLock lock(&mu_);
       return CheckResolutionLocked();
     };
@@ -282,7 +280,7 @@ const grpc_channel_filter ClientChannel::kFilterVtable = {
     ClientChannel::MakeCallPromise,
     ClientChannel::StartTransportOp,
     sizeof(ClientChannel::CallData),
-    ClientChannel::CallData::Init,
+    Init,
     ClientChannel::CallData::SetPollent,
     ClientChannel::CallData::Destroy,
     sizeof(ClientChannel),
@@ -1143,9 +1141,8 @@ ClientChannel::CreateLoadBalancedCall(
 
 ArenaPromise<ServerMetadataHandle> ClientChannel::CreateLoadBalancedCallPromise(
     CallArgs call_args, bool is_transparent_retry) {
-  auto* lb_call =
-      GetContext<Arena>()->ManagedNew<PromiseBasedLoadBalancedCall>(
-          this, is_transparent_retry);
+  auto* lb_call = GetContext<Arena>()->ManagedNew<PromiseBasedLoadBalancedCall>(
+      this, is_transparent_retry);
   return lb_call->MakeCallPromise(std::move(call_args));
 }
 
@@ -3273,14 +3270,15 @@ ClientChannel::PromiseBasedLoadBalancedCall::PromiseBasedLoadBalancedCall(
           [&]() {
             auto* service_config_call_data =
                 static_cast<ClientChannelServiceConfigCallData*>(
-                    GetContext<grpc_call_context_element>()[
-                        GRPC_CONTEXT_SERVICE_CONFIG_CALL_DATA].value);
+                    GetContext<grpc_call_context_element>()
+                        [GRPC_CONTEXT_SERVICE_CONFIG_CALL_DATA]
+                            .value);
             return service_config_call_data->call_dispatch_controller();
           }(),
           is_transparent_retry) {}
 
 ClientChannel::PromiseBasedLoadBalancedCall::~PromiseBasedLoadBalancedCall() {
-// FIXME: finish args
+  // FIXME: finish args
   lb_subchannel_call_tracker()->Finish(...);
 }
 
