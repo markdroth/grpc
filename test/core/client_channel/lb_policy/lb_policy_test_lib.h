@@ -50,6 +50,7 @@
 #include <grpc/support/log.h>
 
 #include "src/core/ext/filters/client_channel/lb_call_state_internal.h"
+#include "src/core/ext/filters/client_channel/lb_policy/backend_metric_data.h"
 #include "src/core/ext/filters/client_channel/subchannel_pool_interface.h"
 #include "src/core/lib/address_utils/parse_address.h"
 #include "src/core/lib/address_utils/sockaddr_utils.h"
@@ -376,8 +377,7 @@ class LoadBalancingPolicyTest : public ::testing::Test {
 
     LoadBalancingPolicyTest* test_;
     std::shared_ptr<WorkSerializer> work_serializer_;
-    std::shared_ptr<grpc_event_engine::experimental::EventEngine>
-        event_engine_;
+    std::shared_ptr<grpc_event_engine::experimental::EventEngine> event_engine_;
 
     Mutex mu_;
     std::deque<Event> queue_ ABSL_GUARDED_BY(&mu_);
@@ -766,12 +766,11 @@ class LoadBalancingPolicyTest : public ::testing::Test {
     for (size_t i = 0; i < num_picks; ++i) {
       std::unique_ptr<LoadBalancingPolicy::SubchannelCallTrackerInterface>
           subchannel_call_tracker;
-      auto address = ExpectPickComplete(
-          picker, call_attributes,
-          subchannel_call_trackers == nullptr
-              ? nullptr
-              : &subchannel_call_tracker,
-          location);
+      auto address = ExpectPickComplete(picker, call_attributes,
+                                        subchannel_call_trackers == nullptr
+                                            ? nullptr
+                                            : &subchannel_call_tracker,
+                                        location);
       if (!address.has_value()) return absl::nullopt;
       results.emplace_back(std::move(*address));
       if (subchannel_call_trackers != nullptr) {
