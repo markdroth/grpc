@@ -1253,9 +1253,8 @@ TEST_F(PickFirstTest, ReresolutionNoSelected) {
   response_generator.SetNextResolution(dead_ports);
   gpr_log(GPR_INFO, "****** INITIAL RESOLUTION SET *******");
   for (size_t i = 0; i < 10; ++i) {
-    CheckRpcSendFailure(
-        DEBUG_LOCATION, stub, StatusCode::UNAVAILABLE,
-        kConnectionFailureRegex);
+    CheckRpcSendFailure(DEBUG_LOCATION, stub, StatusCode::UNAVAILABLE,
+                        kConnectionFailureRegex);
   }
   // Set a re-resolution result that contains reachable ports, so that the
   // pick_first LB policy can recover soon.
@@ -1489,9 +1488,8 @@ TEST_F(PickFirstTest,
   response_generator.SetNextResolution(ports);
   EXPECT_EQ(GRPC_CHANNEL_IDLE, channel->GetState(false));
   // Send an RPC, which should fail.
-  CheckRpcSendFailure(
-      DEBUG_LOCATION, stub, StatusCode::UNAVAILABLE,
-      kConnectionFailureRegex);
+  CheckRpcSendFailure(DEBUG_LOCATION, stub, StatusCode::UNAVAILABLE,
+                      kConnectionFailureRegex);
   // Channel should be in TRANSIENT_FAILURE.
   EXPECT_EQ(GRPC_CHANNEL_TRANSIENT_FAILURE, channel->GetState(false));
   // Now start a server on the last port.
@@ -1767,9 +1765,8 @@ TEST_F(RoundRobinTest, TransientFailure) {
     return state == GRPC_CHANNEL_TRANSIENT_FAILURE;
   };
   EXPECT_TRUE(WaitForChannelState(channel.get(), predicate));
-  CheckRpcSendFailure(
-      DEBUG_LOCATION, stub, StatusCode::UNAVAILABLE,
-      kConnectionFailureRegex);
+  CheckRpcSendFailure(DEBUG_LOCATION, stub, StatusCode::UNAVAILABLE,
+                      kConnectionFailureRegex);
 }
 
 TEST_F(RoundRobinTest, TransientFailureAtStartup) {
@@ -1790,9 +1787,8 @@ TEST_F(RoundRobinTest, TransientFailureAtStartup) {
     return state == GRPC_CHANNEL_TRANSIENT_FAILURE;
   };
   EXPECT_TRUE(WaitForChannelState(channel.get(), predicate, true));
-  CheckRpcSendFailure(
-      DEBUG_LOCATION, stub, StatusCode::UNAVAILABLE,
-      kConnectionFailureRegex);
+  CheckRpcSendFailure(DEBUG_LOCATION, stub, StatusCode::UNAVAILABLE,
+                      kConnectionFailureRegex);
 }
 
 TEST_F(RoundRobinTest, StaysInTransientFailureInSubsequentConnecting) {
@@ -1824,9 +1820,8 @@ TEST_F(RoundRobinTest, StaysInTransientFailureInSubsequentConnecting) {
   // new picker, in case it was going to incorrectly do so.
   gpr_log(GPR_INFO, "=== EXPECTING RPCs TO FAIL ===");
   for (size_t i = 0; i < 5; ++i) {
-    CheckRpcSendFailure(
-        DEBUG_LOCATION, stub, StatusCode::UNAVAILABLE,
-        kConnectionFailureRegex);
+    CheckRpcSendFailure(DEBUG_LOCATION, stub, StatusCode::UNAVAILABLE,
+                        kConnectionFailureRegex);
   }
   // Clean up.
   hold->Resume();
@@ -1845,8 +1840,8 @@ TEST_F(RoundRobinTest, ReportsLatestStatusInTransientFailure) {
   response_generator.SetNextResolution(ports);
   // Allow first connection attempts to fail normally, and check that
   // the RPC fails with the right status message.
-  CheckRpcSendFailure(
-      DEBUG_LOCATION, stub, StatusCode::UNAVAILABLE, kConnectionFailureRegex);
+  CheckRpcSendFailure(DEBUG_LOCATION, stub, StatusCode::UNAVAILABLE,
+                      kConnectionFailureRegex);
   // Now intercept the next connection attempt for each port.
   auto hold1 = injector.AddHold(ports[0]);
   auto hold2 = injector.AddHold(ports[1]);

@@ -34,6 +34,7 @@
 #include "absl/strings/string_view.h"
 #include "absl/types/optional.h"
 
+#include <grpc/event_engine/event_engine.h>
 #include <grpc/impl/connectivity_state.h>
 #include <grpc/support/log.h>
 
@@ -47,6 +48,8 @@
 #include "src/core/lib/json/json.h"
 #include "src/core/lib/load_balancing/lb_policy.h"
 #include "src/core/lib/load_balancing/lb_policy_factory.h"
+#include "src/core/lib/load_balancing/lb_policy_registry.h"
+#include "src/core/lib/load_balancing/subchannel_interface.h"
 #include "src/core/lib/resolver/server_address.h"
 #include "src/core/lib/transport/connectivity_state.h"
 
@@ -236,8 +239,7 @@ RoundRobin::Picker::Picker(
     : parent_(parent), pickers_(std::move(pickers)) {
   // For discussion on why we generate a random starting index for
   // the picker, see https://github.com/grpc/grpc-go/issues/2580.
-  size_t index =
-      absl::Uniform<size_t>(parent->bit_gen_, 0, pickers_.size());
+  size_t index = absl::Uniform<size_t>(parent->bit_gen_, 0, pickers_.size());
   last_picked_index_.store(index, std::memory_order_relaxed);
   if (GRPC_TRACE_FLAG_ENABLED(grpc_lb_round_robin_trace)) {
     gpr_log(GPR_INFO,
@@ -255,7 +257,7 @@ RoundRobin::PickResult RoundRobin::Picker::Pick(PickArgs args) {
             "[RR %p picker %p] using picker index %" PRIuPTR ", picker=%p",
             parent_, this, index, pickers_[index].get());
   }
-  return pickers_[index]->Pick(std::move(args));
+  return pickers_[index]->Pick(args);
 }
 
 //
@@ -312,8 +314,8 @@ absl::Status RoundRobin::UpdateLocked(UpdateArgs args) {
   // Create new child list, replacing the previous pending list, if any.
   if (GRPC_TRACE_FLAG_ENABLED(grpc_lb_round_robin_trace) &&
       latest_pending_child_list_ != nullptr) {
-    gpr_log(GPR_INFO, "[RR %p] replacing previous pending child list %p",
-            this, latest_pending_child_list_.get());
+    gpr_log(GPR_INFO, "[RR %p] replacing previous pending child list %p", this,
+            latest_pending_child_list_.get());
   }
   latest_pending_child_list_ = MakeOrphanable<ChildList>(
       Ref(DEBUG_LOCATION, "ChildList"), std::move(addresses), args.args);
@@ -393,10 +395,9 @@ RoundRobin::ChildList::ChildPolicy::ChildPolicy(
   lb_policy_args.args = args;
   lb_policy_args.channel_control_helper =
       std::make_unique<Helper>(Ref(DEBUG_LOCATION, "Helper"));
-  policy_ = CoreConfiguration::Get()
-                .lb_policy_registry()
-                .CreateLoadBalancingPolicy("pick_first",
-                                           std::move(lb_policy_args));
+  policy_ =
+      CoreConfiguration::Get().lb_policy_registry().CreateLoadBalancingPolicy(
+          "pick_first", std::move(lb_policy_args));
   if (GRPC_TRACE_FLAG_ENABLED(grpc_lb_round_robin_trace)) {
     gpr_log(GPR_INFO, "[RR %p] child %p: created child policy %p",
             child_list_->round_robin_.get(), this, policy_.get());
@@ -442,25 +443,23 @@ void RoundRobin::ChildList::ChildPolicy::OnStateUpdate(
     RefCountedPtr<SubchannelPicker> picker) {
   RoundRobin* round_robin = child_list_->round_robin_.get();
   if (GRPC_TRACE_FLAG_ENABLED(grpc_lb_round_robin_trace)) {
-    gpr_log(
-        GPR_INFO,
-        "[RR %p] connectivity changed for child %p, child_list %p "
-        "(index %" PRIuPTR " of %" PRIuPTR "): prev_state=%s new_state=%s",
-        round_robin, this, child_list_.get(), Index(),
-        child_list_->num_children(),
-        (connectivity_state_.has_value()
-             ? ConnectivityStateName(*connectivity_state_)
-             : "N/A"),
-        ConnectivityStateName(state));
+    gpr_log(GPR_INFO,
+            "[RR %p] connectivity changed for child %p, child_list %p "
+            "(index %" PRIuPTR " of %" PRIuPTR "): prev_state=%s new_state=%s",
+            round_robin, this, child_list_.get(), Index(),
+            child_list_->num_children(),
+            (connectivity_state_.has_value()
+                 ? ConnectivityStateName(*connectivity_state_)
+                 : "N/A"),
+            ConnectivityStateName(state));
   }
-// FIXME: is this still right now that the child is pick_first?
+  // FIXME: is this still right now that the child is pick_first?
   // If this is not the initial state notification and the new state is
   // TRANSIENT_FAILURE or IDLE, re-resolve.
   // Note that we don't want to do this on the initial state notification,
   // because that would result in an endless loop of re-resolution.
   if (connectivity_state_.has_value() &&
-      (state == GRPC_CHANNEL_TRANSIENT_FAILURE ||
-       state == GRPC_CHANNEL_IDLE)) {
+      (state == GRPC_CHANNEL_TRANSIENT_FAILURE || state == GRPC_CHANNEL_IDLE)) {
     if (GRPC_TRACE_FLAG_ENABLED(grpc_lb_round_robin_trace)) {
       gpr_log(GPR_INFO,
               "[RR %p] child %p reported %s; requesting re-resolution",
@@ -499,8 +498,8 @@ void RoundRobin::ChildList::ChildPolicy::UpdateLogicalConnectivityStateLocked(
   if (connectivity_state == GRPC_CHANNEL_IDLE) {
     if (GRPC_TRACE_FLAG_ENABLED(grpc_lb_round_robin_trace)) {
       gpr_log(GPR_INFO,
-              "[RR %p] child %p, child_list %p (index %" PRIuPTR
-              " of %" PRIuPTR "): treating IDLE as CONNECTING",
+              "[RR %p] child %p, child_list %p (index %" PRIuPTR " of %" PRIuPTR
+              "): treating IDLE as CONNECTING",
               round_robin, this, child_list_.get(), Index(),
               child_list_->num_children());
     }
@@ -521,14 +520,13 @@ void RoundRobin::ChildList::ChildPolicy::UpdateLogicalConnectivityStateLocked(
 // RoundRobin::ChildList
 //
 
-RoundRobin::ChildList::ChildList(
-    RefCountedPtr<RoundRobin> round_robin, const ServerAddressList& addresses,
-    const ChannelArgs& args)
+RoundRobin::ChildList::ChildList(RefCountedPtr<RoundRobin> round_robin,
+                                 const ServerAddressList& addresses,
+                                 const ChannelArgs& args)
     : round_robin_(std::move(round_robin)) {
   for (const ServerAddress& address : addresses) {
-    children_.push_back(
-        MakeOrphanable<ChildPolicy>(Ref(DEBUG_LOCATION, "ChildPolicy"),
-                                    address, args));
+    children_.push_back(MakeOrphanable<ChildPolicy>(
+        Ref(DEBUG_LOCATION, "ChildPolicy"), address, args));
   }
 }
 
@@ -601,7 +599,7 @@ void RoundRobin::ChildList::MaybeUpdateRoundRobinConnectivityStateLocked(
   }
   // Only set connectivity state if this is the current subchannel list.
   if (round_robin_->child_list_.get() != this) return;
-// FIXME: scan children each time instead of keeping counters?
+  // FIXME: scan children each time instead of keeping counters?
   // First matching rule wins:
   // 1) ANY subchannel is READY => policy is READY.
   // 2) ANY subchannel is CONNECTING => policy is CONNECTING.
