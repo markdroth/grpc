@@ -16,26 +16,55 @@
 
 #include <grpc/support/port_platform.h>
 
-#include "src/core/ext/filters/client_channel/lb_policy/health_check_client_internal.h"
+#include <stdint.h>
+#include <string.h>
 
+#include <map>
+#include <memory>
+#include <set>
+#include <string>
+#include <type_traits>
+#include <utility>
+
+#include "absl/base/thread_annotations.h"
+#include "absl/memory/memory.h"
+#include "absl/status/status.h"
+#include "absl/status/statusor.h"
+#include "absl/strings/string_view.h"
+#include "absl/types/optional.h"
+#include "upb/upb.h"
 #include "upb/upb.hpp"
 
+#include <grpc/impl/connectivity_state.h>
+#include <grpc/slice.h>
 #include <grpc/status.h>
+#include <grpc/support/log.h>
 
+#include "src/core/ext/filters/client_channel/client_channel_channelz.h"
+#include "src/core/ext/filters/client_channel/lb_policy/health_check_client_internal.h"
 #include "src/core/ext/filters/client_channel/subchannel.h"
-#include "src/core/ext/filters/client_channel/subchannel_interface_internal.h"
 #include "src/core/ext/filters/client_channel/subchannel_stream_client.h"
+#include "src/core/lib/channel/channel_trace.h"
 #include "src/core/lib/debug/trace.h"
+#include "src/core/lib/gprpp/debug_location.h"
+#include "src/core/lib/gprpp/orphanable.h"
+#include "src/core/lib/gprpp/ref_counted_ptr.h"
 #include "src/core/lib/gprpp/sync.h"
-#include "src/core/lib/gprpp/time.h"
-#include "src/core/lib/slice/slice_internal.h"
-#include "src/core/lib/transport/error_utils.h"
+#include "src/core/lib/gprpp/work_serializer.h"
+#include "src/core/lib/iomgr/closure.h"
+#include "src/core/lib/iomgr/error.h"
+#include "src/core/lib/iomgr/exec_ctx.h"
+#include "src/core/lib/iomgr/iomgr_fwd.h"
+#include "src/core/lib/iomgr/pollset_set.h"
+#include "src/core/lib/load_balancing/subchannel_interface.h"
+#include "src/core/lib/slice/slice.h"
+#include "src/core/lib/transport/connectivity_state.h"
 #include "src/proto/grpc/health/v1/health.upb.h"
 
 namespace grpc_core {
 
 // FIXME
-//TraceFlag grpc_health_check_client_trace(false, "health_check_client");
+// TraceFlag grpc_health_check_client_trace(false, "health_check_client");
 extern TraceFlag grpc_health_check_client_trace;
 
 //
@@ -81,9 +110,8 @@ class HealthProducer::HealthChecker
     stream_client_ = MakeOrphanable<SubchannelStreamClient>(
         producer_->connected_subchannel_, producer_->subchannel_->pollset_set(),
         absl::make_unique<HealthStreamEventHandler>(Ref()),
-        GRPC_TRACE_FLAG_ENABLED(grpc_health_check_client_trace)
-            ? "HealthClient"
-            : nullptr);
+        GRPC_TRACE_FLAG_ENABLED(grpc_health_check_client_trace) ? "HealthClient"
+                                                                : nullptr);
   }
 
   // Stops the stream when the subchannel becomes disconnected.
@@ -121,7 +149,7 @@ class HealthProducer::HealthChecker
   // order (hence the use of WorkSerializer).
   void NotifyWatchersLocked(grpc_connectivity_state state,
                             absl::Status status) {
-// FIXME: fix trace messages
+    // FIXME: fix trace messages
     if (GRPC_TRACE_FLAG_ENABLED(grpc_health_check_client_trace)) {
       gpr_log(GPR_INFO, "HealthProducer %p: reporting state %s to watchers",
               this, ConnectivityStateName(state));
@@ -154,8 +182,7 @@ class HealthProducer::HealthChecker
 class HealthProducer::HealthChecker::HealthStreamEventHandler
     : public SubchannelStreamClient::CallEventHandler {
  public:
-  explicit HealthStreamEventHandler(
-      RefCountedPtr<HealthChecker> health_checker)
+  explicit HealthStreamEventHandler(RefCountedPtr<HealthChecker> health_checker)
       : health_checker_(std::move(health_checker)) {}
 
   Slice GetPathLocked() override {
@@ -177,7 +204,8 @@ class HealthProducer::HealthChecker::HealthStreamEventHandler
     grpc_health_v1_HealthCheckRequest* request_struct =
         grpc_health_v1_HealthCheckRequest_new(arena.ptr());
     grpc_health_v1_HealthCheckRequest_set_service(
-        request_struct, upb_StringView_FromDataAndSize(
+        request_struct,
+        upb_StringView_FromDataAndSize(
             health_checker_->health_check_service_name_.data(),
             health_checker_->health_check_service_name_.size()));
     size_t buf_length;
@@ -248,10 +276,9 @@ class HealthProducer::HealthChecker::HealthStreamEventHandler
               client, ConnectivityStateName(state), reason);
     }
     health_checker_->NotifyWatchersLocked(
-        state,
-        state == GRPC_CHANNEL_TRANSIENT_FAILURE
-            ? absl::UnavailableError(reason)
-            : absl::OkStatus());
+        state, state == GRPC_CHANNEL_TRANSIENT_FAILURE
+                   ? absl::UnavailableError(reason)
+                   : absl::OkStatus());
   }
 
   RefCountedPtr<HealthChecker> health_checker_;
@@ -396,9 +423,9 @@ MakeHealthCheckWatcher(
     absl::string_view health_check_service_name,
     std::unique_ptr<SubchannelInterface::ConnectivityStateWatcherInterface>
         watcher) {
-  return std::make_unique<HealthWatcher>(
-      std::move(work_serializer), health_check_service_name,
-      std::move(watcher));
+  return std::make_unique<HealthWatcher>(std::move(work_serializer),
+                                         health_check_service_name,
+                                         std::move(watcher));
 }
 
 }  // namespace grpc_core

@@ -2798,6 +2798,7 @@ grpc_cc_library(
         "absl/cleanup",
         "absl/container:flat_hash_set",
         "absl/container:inlined_vector",
+        "absl/memory",
         "absl/status",
         "absl/status:statusor",
         "absl/strings",
