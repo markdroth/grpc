@@ -44,15 +44,14 @@ class Json {
 
   Json() = default;
 
-// FIXME: make sure construction from nullptr does the right thing
+  // FIXME: make sure construction from nullptr does the right thing
 
   // Copyable.
   Json(const Json& other) = default;
   Json& operator=(const Json& other) = default;
 
   // Moveable.
-  Json(Json&& other) noexcept
-      : value_(std::move(other.value_)) {
+  Json(Json&& other) noexcept : value_(std::move(other.value_)) {
     other.value_ = absl::monostate();
   }
   Json& operator=(Json&& other) noexcept {
@@ -73,12 +72,12 @@ class Json {
 
   // Same thing for C-style strings, both const and mutable.
   // NOLINTNEXTLINE(google-explicit-constructor)
-// FIXME: maybe replace this with absl::string_view to avoid nullptr
-// problem?
-// FIXME: maybe avoid default arg by having static factory methods for
-// each type, where the name of the factory method explicitly states the
-// type?
-  Json(const char* string, bool is_number = false)
+  // FIXME: maybe replace this with absl::string_view to avoid nullptr
+  // problem?
+  // FIXME: maybe avoid default arg by having static factory methods for
+  // each type, where the name of the factory method explicitly states the
+  // type?
+  explicit Json(const char* string, bool is_number = false)
       : Json(std::string(string), is_number) {}
   Json& operator=(const char* string) {
     *this = std::string(string);
@@ -166,10 +165,10 @@ class Json {
   }
 
   // Accessor methods.
-// FIXME: need these APIs to work if underlying data struct is a union
-// or variant -- maybe assert on type_ in each method?
-// (assert also important because we're using const reference return values)
-// FIXME: maybe use string_view for strings?
+  // FIXME: need these APIs to work if underlying data struct is a union
+  // or variant -- maybe assert on type_ in each method?
+  // (assert also important because we're using const reference return values)
+  // FIXME: maybe use string_view for strings?
   const std::string& string() const {
     const NumberValue* num = absl::get_if<NumberValue>(&value_);
     if (num != nullptr) return num->value;
@@ -189,15 +188,14 @@ class Json {
       return value == other.value;
     }
   };
-  using Value = absl::variant<
-      absl::monostate,  // kNull
-      bool,             // kTrue or kFalse
-      NumberValue,      // kNumber
-      std::string,      // kString
-      Object,           // kObject
-      Array>;           // kArray
+  using Value = absl::variant<absl::monostate,  // kNull
+                              bool,             // kTrue or kFalse
+                              NumberValue,      // kNumber
+                              std::string,      // kString
+                              Object,           // kObject
+                              Array>;           // kArray
 
-  Json(Value value) : value_(std::move(value)) {}
+  explicit Json(Value value) : value_(std::move(value)) {}
 
   Value value_;
 };
