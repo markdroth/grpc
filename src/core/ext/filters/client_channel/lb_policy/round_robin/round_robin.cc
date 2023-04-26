@@ -34,6 +34,7 @@
 #include "absl/strings/string_view.h"
 #include "absl/types/optional.h"
 
+#include <grpc/event_engine/event_engine.h>
 #include <grpc/impl/connectivity_state.h>
 #include <grpc/support/log.h>
 
@@ -48,6 +49,8 @@
 #include "src/core/lib/json/json.h"
 #include "src/core/lib/load_balancing/lb_policy.h"
 #include "src/core/lib/load_balancing/lb_policy_factory.h"
+#include "src/core/lib/load_balancing/lb_policy_registry.h"
+#include "src/core/lib/load_balancing/subchannel_interface.h"
 #include "src/core/lib/resolver/server_address.h"
 #include "src/core/lib/transport/connectivity_state.h"
 
@@ -255,7 +258,7 @@ RoundRobin::PickResult RoundRobin::Picker::Pick(PickArgs args) {
             "[RR %p picker %p] using picker index %" PRIuPTR ", picker=%p",
             parent_, this, index, pickers_[index].get());
   }
-  return pickers_[index]->Pick(std::move(args));
+  return pickers_[index]->Pick(args);
 }
 
 //
@@ -454,7 +457,7 @@ void RoundRobin::ChildList::ChildPolicy::OnStateUpdate(
                  : "N/A"),
             ConnectivityStateName(state));
   }
-// FIXME: is this still right now that the child is pick_first?
+  // FIXME: is this still right now that the child is pick_first?
   // If this is not the initial state notification and the new state is
   // TRANSIENT_FAILURE or IDLE, re-resolve.
   // Note that we don't want to do this on the initial state notification,
@@ -599,7 +602,7 @@ void RoundRobin::ChildList::MaybeUpdateRoundRobinConnectivityStateLocked(
   }
   // Only set connectivity state if this is the current child list.
   if (round_robin_->child_list_.get() != this) return;
-// FIXME: scan children each time instead of keeping counters?
+  // FIXME: scan children each time instead of keeping counters?
   // First matching rule wins:
   // 1) ANY child is READY => policy is READY.
   // 2) ANY child is CONNECTING => policy is CONNECTING.
