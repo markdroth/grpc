@@ -4552,7 +4552,6 @@ grpc_cc_library(
         "//:orphanable",
         "//:ref_counted_ptr",
         "//:server_address",
-        "//:work_serializer",
     ],
 )
 
@@ -4623,7 +4622,9 @@ grpc_cc_library(
         "json",
         "lb_policy",
         "lb_policy_factory",
+        "lb_policy_registry",
         "pollset_set",
+        "subchannel_interface",
         "//:config",
         "//:debug_location",
         "//:gpr",
