@@ -168,8 +168,8 @@ class RingHash : public LoadBalancingPolicy {
       };
 
       RingHashEndpoint(RefCountedPtr<RingHashEndpointList> endpoint_list,
-                         const ServerAddress& address, const ChannelArgs& args,
-                         std::shared_ptr<WorkSerializer> work_serializer)
+                       const ServerAddress& address, const ChannelArgs& args,
+                       std::shared_ptr<WorkSerializer> work_serializer)
           : Endpoint(std::move(endpoint_list)) {
         // FIXME: need to lazily create PF child!
         Init(address, args, std::move(work_serializer));
@@ -261,8 +261,7 @@ class RingHash : public LoadBalancingPolicy {
    public:
     Picker(RefCountedPtr<RingHash> ring_hash_lb,
            RingHashEndpointList* endpoint_list)
-        : ring_hash_lb_(std::move(ring_hash_lb)),
-          ring_(endpoint_list->ring()) {
+        : ring_hash_lb_(std::move(ring_hash_lb)), ring_(endpoint_list->ring()) {
       endpoints_.reserve(endpoint_list->size());
       for (const auto& endpoint : endpoint_list->endpoints()) {
         auto* ep = static_cast<RingHashEndpointList::RingHashEndpoint*>(
@@ -278,8 +277,7 @@ class RingHash : public LoadBalancingPolicy {
     // on the control plane WorkSerializer.
     class EndpointConnectionAttempter : public Orphanable {
      public:
-      explicit EndpointConnectionAttempter(
-          RefCountedPtr<RingHash> ring_hash_lb)
+      explicit EndpointConnectionAttempter(RefCountedPtr<RingHash> ring_hash_lb)
           : ring_hash_lb_(std::move(ring_hash_lb)) {
         GRPC_CLOSURE_INIT(&closure_, RunInExecCtx, this, nullptr);
       }
@@ -450,9 +448,9 @@ RingHash::PickResult RingHash::Picker::Pick(PickArgs args) {
 // RingHash::RingHashEndpointList::Ring
 //
 
-RingHash::RingHashEndpointList::Ring::Ring(
-    RingHashLbConfig* config, const ServerAddressList& addresses,
-    const ChannelArgs& args) {
+RingHash::RingHashEndpointList::Ring::Ring(RingHashLbConfig* config,
+                                           const ServerAddressList& addresses,
+                                           const ChannelArgs& args) {
   // Store the weights while finding the sum.
   struct AddressWeight {
     std::string address;
@@ -465,9 +463,9 @@ RingHash::RingHashEndpointList::Ring::Ring(
   size_t sum = 0;
   address_weights.reserve(addresses.size());
   for (const auto& address : addresses) {
-    const auto* weight_attribute = static_cast<
-        const ServerAddressWeightAttribute*>(address.GetAttribute(
-        ServerAddressWeightAttribute::kServerAddressWeightAttributeKey));
+    const auto* weight_attribute =
+        static_cast<const ServerAddressWeightAttribute*>(address.GetAttribute(
+            ServerAddressWeightAttribute::kServerAddressWeightAttributeKey));
     AddressWeight address_weight;
     address_weight.address =
         grpc_sockaddr_to_string(&address.address(), false).value();
@@ -576,9 +574,9 @@ void RingHash::RingHashEndpointList::UpdateStateCountersLocked(
   }
 }
 
-void
-RingHash::RingHashEndpointList::MaybeUpdateAggregatedConnectivityStateLocked(
-    size_t index, bool connection_attempt_complete, absl::Status status) {
+void RingHash::RingHashEndpointList::
+    MaybeUpdateAggregatedConnectivityStateLocked(
+        size_t index, bool connection_attempt_complete, absl::Status status) {
   auto* ring_hash = policy<RingHash>();
   // If this is latest_pending_endpoint_list_, then swap it into
   // endpoint_list_ as soon as we get the initial connectivity state
@@ -644,8 +642,8 @@ RingHash::RingHashEndpointList::MaybeUpdateAggregatedConnectivityStateLocked(
   // Note that we use our own picker regardless of connectivity state.
   ring_hash->channel_control_helper()->UpdateState(
       state, status,
-      MakeRefCounted<Picker>(
-          ring_hash->Ref(DEBUG_LOCATION, "RingHashPicker"), this));
+      MakeRefCounted<Picker>(ring_hash->Ref(DEBUG_LOCATION, "RingHashPicker"),
+                             this));
   // While the ring_hash policy is reporting TRANSIENT_FAILURE, it will
   // not be getting any pick requests from the priority policy.
   // However, because the ring_hash policy does not attempt to
@@ -769,8 +767,8 @@ absl::Status RingHash::UpdateLocked(UpdateArgs args) {
   }
   if (GRPC_TRACE_FLAG_ENABLED(grpc_lb_ring_hash_trace) &&
       latest_pending_endpoint_list_ != nullptr) {
-    gpr_log(GPR_INFO, "[RH %p] replacing latest pending endpoint list %p",
-            this, latest_pending_endpoint_list_.get());
+    gpr_log(GPR_INFO, "[RH %p] replacing latest pending endpoint list %p", this,
+            latest_pending_endpoint_list_.get());
   }
   latest_pending_endpoint_list_ = MakeOrphanable<RingHashEndpointList>(
       Ref(), std::move(addresses), args.args);
@@ -778,8 +776,7 @@ absl::Status RingHash::UpdateLocked(UpdateArgs args) {
   // promote the new list.
   // Otherwise, do nothing; the new list will be promoted when the
   // initial connectivity states are reported.
-  if (endpoint_list_ == nullptr ||
-      latest_pending_endpoint_list_->size() == 0) {
+  if (endpoint_list_ == nullptr || latest_pending_endpoint_list_->size() == 0) {
     if (GRPC_TRACE_FLAG_ENABLED(grpc_lb_ring_hash_trace) &&
         endpoint_list_ != nullptr) {
       gpr_log(GPR_INFO,
