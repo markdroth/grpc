@@ -20,6 +20,8 @@
 
 #include "src/core/lib/transport/tcp_connect_handshaker.h"
 
+#include <stdint.h>
+
 #include <memory>
 
 #include "absl/base/thread_annotations.h"
@@ -28,7 +30,6 @@
 #include "absl/strings/string_view.h"
 #include "absl/types/optional.h"
 
-#include <grpc/slice.h>
 #include <grpc/slice_buffer.h>
 #include <grpc/support/alloc.h>
 #include <grpc/support/log.h>

@@ -993,7 +993,6 @@ grpc_cc_library(
         "iomgr_fwd",
         "pollset_set",
         "resolved_address",
-        "slice",
         "//:config",
         "//:debug_location",
         "//:exec_ctx",
