@@ -20,15 +20,11 @@
 
 #include "src/core/ext/xds/file_watcher_certificate_provider_factory.h"
 
-#include <algorithm>
-#include <initializer_list>
 #include <map>
 #include <memory>
-#include <vector>
+#include <utility>
 
-#include "absl/strings/str_format.h"
-#include "absl/strings/str_join.h"
-
+#include <grpc/support/json.h>
 #include <grpc/support/log.h>
 #include <grpc/support/time.h>
 
@@ -49,7 +45,7 @@ constexpr absl::string_view kFileWatcherPlugin = "file_watcher";
 //
 
 constexpr Duration
-FileWatcherCertificateProviderFactory::Config::kDefaultRefreshInterval;
+    FileWatcherCertificateProviderFactory::Config::kDefaultRefreshInterval;
 
 absl::string_view FileWatcherCertificateProviderFactory::Config::name() const {
   return kFileWatcherPlugin;
