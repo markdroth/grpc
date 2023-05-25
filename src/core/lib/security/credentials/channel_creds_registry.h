@@ -21,8 +21,8 @@
 
 #include <map>
 #include <memory>
-#include <string>
 #include <type_traits>
+#include <utility>
 
 #include "absl/strings/string_view.h"
 
@@ -38,7 +38,7 @@ namespace grpc_core {
 
 class ChannelCredsConfig : public RefCounted<ChannelCredsConfig> {
  public:
-  virtual ~ChannelCredsConfig() = default;
+  ~ChannelCredsConfig() override = default;
 
   virtual absl::string_view type() const = 0;
 
