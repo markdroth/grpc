@@ -33,11 +33,9 @@
 #include "absl/strings/string_view.h"
 #include "absl/types/optional.h"
 
-#include <grpc/grpc.h>
 #include <grpc/impl/connectivity_state.h>
 #include <grpc/support/log.h>
 
-#include "src/core/ext/filters/client_channel/client_channel_internal.h"
 #include "src/core/ext/filters/client_channel/lb_policy/health_check_client.h"
 #include "src/core/ext/filters/client_channel/lb_policy/outlier_detection/outlier_detection.h"
 #include "src/core/lib/channel/channel_args.h"
