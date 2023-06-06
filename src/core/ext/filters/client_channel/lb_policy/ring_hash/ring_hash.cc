@@ -784,7 +784,7 @@ void RingHash::UpdateAggregatedConnectivityStateLocked(
   // Note that we do the same thing when the policy is in state
   // CONNECTING, just to ensure that we don't remain in CONNECTING state
   // indefinitely if there are no new picks coming in.
-// FIXME: is this all still right now that we're seeing sticky-TF from PF?
+  // FIXME: is this all still right now that we're seeing sticky-TF from PF?
   if (internally_triggered_connection_index_.has_value() &&
       *internally_triggered_connection_index_ == index &&
       connection_attempt_complete) {
