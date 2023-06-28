@@ -655,7 +655,7 @@ absl::Status RingHash::UpdateLocked(UpdateArgs args) {
   }
   endpoint_map_ = std::move(endpoint_map);
   // If the address list is empty, report TRANSIENT_FAILURE.
-// FIXME: do this
+  // FIXME: do this
   // TODO(roth): As part of adding dualstack backend support, we need to
   // also handle the case where the list of addresses for a given
   // endpoint is empty.
