@@ -59,6 +59,7 @@
 #include "src/core/lib/iomgr/exec_ctx.h"
 #include "src/core/lib/iomgr/iomgr_fwd.h"
 #include "src/core/lib/iomgr/pollset_set.h"
+#include "src/core/lib/iomgr/resolved_address.h"
 #include "src/core/lib/json/json.h"
 #include "src/core/lib/load_balancing/delegating_helper.h"
 #include "src/core/lib/load_balancing/lb_policy.h"
@@ -600,7 +601,7 @@ absl::Status OutlierDetectionLb::UpdateLocked(UpdateArgs args) {
   if (args.addresses.ok()) {
     std::set<std::string> current_addresses;
     for (const EndpointAddresses& addresses : *args.addresses) {
-// FIXME: support multiple addresses
+      // FIXME: support multiple addresses
       std::string address_key = MakeKeyForAddress(addresses.address());
       if (address_key.empty()) continue;
       auto& subchannel_state = subchannel_state_map_[address_key];
@@ -718,9 +719,8 @@ RefCountedPtr<SubchannelInterface> OutlierDetectionLb::Helper::CreateSubchannel(
     }
   }
   auto subchannel = MakeRefCounted<SubchannelWrapper>(
-      subchannel_state,
-      parent()->channel_control_helper()->CreateSubchannel(
-          address, per_address_args, args));
+      subchannel_state, parent()->channel_control_helper()->CreateSubchannel(
+                            address, per_address_args, args));
   if (subchannel_state != nullptr) {
     subchannel_state->AddSubchannel(subchannel.get());
   }

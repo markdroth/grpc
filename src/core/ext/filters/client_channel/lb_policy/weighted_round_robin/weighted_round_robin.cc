@@ -186,7 +186,7 @@ class WeightedRoundRobin : public LoadBalancingPolicy {
                   std::shared_ptr<WorkSerializer> work_serializer)
           : Endpoint(std::move(endpoint_list)),
             weight_(policy<WeightedRoundRobin>()->GetOrCreateWeight(
-// FIXME: support multiple addresses
+                // FIXME: support multiple addresses
                 addresses.address())) {
         Init(addresses, args, std::move(work_serializer));
       }
@@ -657,7 +657,7 @@ absl::Status WeightedRoundRobin::UpdateLocked(UpdateArgs args) {
       gpr_log(GPR_INFO, "[WRR %p] received update with %" PRIuPTR " addresses",
               this, args.addresses->size());
     }
-// FIXME: this needs to deal with multiple addresses per endpoint
+    // FIXME: this needs to deal with multiple addresses per endpoint
     // Weed out duplicate addresses.  Also sort the addresses so that if
     // the set of the addresses don't change, their indexes in the
     // subchannel list don't change, since this avoids unnecessary churn
