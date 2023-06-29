@@ -32,6 +32,8 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 
+#include <grpc/support/log.h>
+
 #include "src/core/lib/address_utils/sockaddr_utils.h"
 #include "src/core/lib/channel/channel_args.h"
 #include "src/core/lib/gpr/useful.h"
@@ -134,6 +136,7 @@ bool EndpointAddressSet::ResolvedAddressLessThan::operator()(
 
 std::string EndpointAddressSet::ToString() const {
   std::vector<std::string> parts;
+  parts.reserve(addresses_.size());
   for (const auto& address : addresses_) {
     parts.push_back(
         grpc_sockaddr_to_string(&address, false).value_or("<unknown>"));
