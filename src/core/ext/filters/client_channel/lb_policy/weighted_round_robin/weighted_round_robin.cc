@@ -22,7 +22,6 @@
 
 #include <algorithm>
 #include <atomic>
-#include <functional>
 #include <map>
 #include <memory>
 #include <set>
@@ -49,7 +48,6 @@
 #include "src/core/ext/filters/client_channel/lb_policy/endpoint_list.h"
 #include "src/core/ext/filters/client_channel/lb_policy/oob_backend_metric.h"
 #include "src/core/ext/filters/client_channel/lb_policy/weighted_round_robin/static_stride_scheduler.h"
-#include "src/core/lib/address_utils/sockaddr_utils.h"
 #include "src/core/lib/channel/channel_args.h"
 #include "src/core/lib/config/core_configuration.h"
 #include "src/core/lib/debug/trace.h"
