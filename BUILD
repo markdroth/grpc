@@ -2896,6 +2896,7 @@ grpc_cc_library(
     language = "c++",
     visibility = ["@grpc:client_channel"],
     deps = [
+        "gpr",
         "gpr_platform",
         "sockaddr_utils",
         "//src/core:channel_args",
