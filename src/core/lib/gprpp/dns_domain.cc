@@ -16,9 +16,9 @@
 
 #include <grpc/support/port_platform.h>
 
-#include "absl/strings/ascii.h"
-
 #include "src/core/lib/gprpp/dns_domain.h"
+
+#include "absl/strings/ascii.h"
 
 namespace grpc_core {
 
