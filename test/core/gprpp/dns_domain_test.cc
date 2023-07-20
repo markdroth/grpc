@@ -14,6 +14,8 @@
 
 #include "src/core/lib/gprpp/dns_domain.h"
 
+#include <string>
+
 #include "absl/strings/ascii.h"
 #include "gtest/gtest.h"
 
@@ -33,7 +35,7 @@ TEST(IsValidDnsDomain, InValid) {
   EXPECT_FALSE(IsValidDnsDomain("1.com"));
   EXPECT_FALSE(IsValidDnsDomain("a..b"));
   EXPECT_FALSE(IsValidDnsDomain(".a"));
-  for (unsigned char c = 0; ; ++c) {
+  for (unsigned char c = 0;; ++c) {
     if (!absl::ascii_isalnum(c) && c != '.') {
       EXPECT_FALSE(IsValidDnsDomain(std::string(1, c)));
     }
