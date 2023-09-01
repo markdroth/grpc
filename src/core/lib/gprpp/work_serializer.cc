@@ -24,6 +24,7 @@
 #include <functional>
 #include <memory>
 #include <thread>
+#include <type_traits>
 #include <utility>
 
 #include <grpc/support/log.h>
@@ -279,8 +280,7 @@ void WorkSerializer::WorkSerializerImpl::RunNextCallbackFromQueue() {
 //
 
 WorkSerializer::WorkSerializer(
-    std::shared_ptr<grpc_event_engine::experimental::EventEngine>
-        event_engine)
+    std::shared_ptr<grpc_event_engine::experimental::EventEngine> event_engine)
     : impl_(MakeOrphanable<WorkSerializerImpl>(std::move(event_engine))) {}
 
 WorkSerializer::~WorkSerializer() {}

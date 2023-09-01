@@ -3067,6 +3067,7 @@ grpc_cc_library(
         "//src/core:env",
         "//src/core:error",
         "//src/core:gpr_atm",
+        "//src/core:gpr_manual_constructor",
         "//src/core:grpc_backend_metric_data",
         "//src/core:grpc_deadline_filter",
         "//src/core:grpc_service_config",
