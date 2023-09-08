@@ -335,14 +335,14 @@ class LoadBalancingPolicyTest : public ::testing::Test {
       absl::Notification notification;
       work_serializer_->Run(
           [&]() ABSL_EXCLUSIVE_LOCKS_REQUIRED(*work_serializer_) {
-                if (validate_state_transition) {
-                  AssertValidConnectivityStateTransition(state_tracker_.state(),
-                                                         state, location);
-                }
-                state_tracker_.SetState(state, status, "set from test");
-                work_serializer_->Run([&]() { notification.Notify(); },
-                                      DEBUG_LOCATION);
-              },
+            if (validate_state_transition) {
+              AssertValidConnectivityStateTransition(state_tracker_.state(),
+                                                     state, location);
+            }
+            state_tracker_.SetState(state, status, "set from test");
+            work_serializer_->Run([&]() { notification.Notify(); },
+                                  DEBUG_LOCATION);
+          },
           DEBUG_LOCATION);
       notification.WaitForNotification();
     }
