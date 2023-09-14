@@ -2911,6 +2911,7 @@ grpc_cc_library(
     visibility = ["@grpc:client_channel"],
     deps = [
         "gpr_platform",
+        "gpr_public_hdrs",
         "sockaddr_utils",
         "//src/core:channel_args",
         "//src/core:resolved_address",

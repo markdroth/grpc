@@ -39,6 +39,7 @@
 #include "src/core/lib/gprpp/work_serializer.h"
 #include "src/core/lib/json/json.h"
 #include "src/core/lib/load_balancing/lb_policy.h"
+#include "src/core/lib/resolver/endpoint_addresses.h"
 #include "test/core/client_channel/lb_policy/lb_policy_test_lib.h"
 #include "test/core/util/test_config.h"
 
@@ -203,10 +204,10 @@ TEST_F(PickFirstTest, FirstAddressFails) {
 
 TEST_F(PickFirstTest, FlattensEndpointAddressesList) {
   // Send an update containing two endpoints, the first one with two addresses.
-  constexpr std::array<absl::string_view, 2> kEndpoint1Addresses =
-      {"ipv4:127.0.0.1:443", "ipv4:127.0.0.1:444"};
-  constexpr std::array<absl::string_view, 1> kEndpoint2Addresses =
-      {"ipv4:127.0.0.1:445"};
+  constexpr std::array<absl::string_view, 2> kEndpoint1Addresses = {
+      "ipv4:127.0.0.1:443", "ipv4:127.0.0.1:444"};
+  constexpr std::array<absl::string_view, 1> kEndpoint2Addresses = {
+      "ipv4:127.0.0.1:445"};
   const std::array<EndpointAddresses, 2> kEndpoints = {
       MakeEndpointAddresses(kEndpoint1Addresses),
       MakeEndpointAddresses(kEndpoint2Addresses)};
