@@ -25,6 +25,7 @@
 
 #include "src/core/lib/channel/channel_args.h"
 #include "src/core/lib/gprpp/ref_counted_ptr.h"
+#include "src/core/lib/resolver/endpoint_addresses.h"
 
 namespace grpc_core {
 

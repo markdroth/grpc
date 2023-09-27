@@ -134,6 +134,7 @@
 #include "src/core/lib/load_balancing/lb_policy_factory.h"
 #include "src/core/lib/load_balancing/lb_policy_registry.h"
 #include "src/core/lib/load_balancing/subchannel_interface.h"
+#include "src/core/lib/resolver/endpoint_addresses.h"
 #include "src/core/lib/resolver/resolver.h"
 #include "src/core/lib/resolver/server_address.h"
 #include "src/core/lib/security/credentials/credentials.h"

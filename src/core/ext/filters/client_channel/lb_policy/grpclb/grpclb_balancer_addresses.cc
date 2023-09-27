@@ -24,6 +24,7 @@
 
 #include "src/core/lib/channel/channel_args.h"
 #include "src/core/lib/gpr/useful.h"
+#include "src/core/lib/resolver/endpoint_addresses.h"
 
 // Channel arg key for the list of balancer addresses.
 #define GRPC_ARG_GRPCLB_BALANCER_ADDRESSES \

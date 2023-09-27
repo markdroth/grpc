@@ -33,6 +33,7 @@
 #include "src/core/lib/gprpp/orphanable.h"
 #include "src/core/lib/iomgr/port.h"
 #include "src/core/lib/iomgr/resolved_address.h"
+#include "src/core/lib/resolver/endpoint_addresses.h"
 #include "src/core/lib/resolver/resolver.h"
 #include "src/core/lib/resolver/resolver_factory.h"
 #include "src/core/lib/resolver/server_address.h"

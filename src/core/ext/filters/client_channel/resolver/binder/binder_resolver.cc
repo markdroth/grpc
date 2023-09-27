@@ -20,6 +20,7 @@
 
 #include "src/core/lib/gprpp/status_helper.h"
 #include "src/core/lib/iomgr/port.h"  // IWYU pragma: keep
+#include "src/core/lib/resolver/endpoint_addresses.h"
 
 #ifdef GRPC_HAVE_UNIX_SOCKET
 

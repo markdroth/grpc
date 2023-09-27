@@ -3064,6 +3064,7 @@ grpc_cc_library(
         "config",
         "config_vars",
         "debug_location",
+        "endpoint_addresses",
         "exec_ctx",
         "gpr",
         "grpc_base",
@@ -3178,6 +3179,7 @@ grpc_cc_library(
         "config",
         "config_vars",
         "debug_location",
+        "endpoint_addresses",
         "exec_ctx",
         "gpr",
         "grpc_base",
@@ -3632,6 +3634,7 @@ grpc_cc_library(
     language = "c++",
     visibility = ["@grpc:grpclb"],
     deps = [
+        "endpoint_addresses",
         "gpr_platform",
         "grpc_public_hdrs",
         "server_address",

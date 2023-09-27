@@ -28,6 +28,7 @@
 
 #include "src/core/lib/gprpp/status_helper.h"
 #include "src/core/lib/iomgr/sockaddr.h"
+#include "src/core/lib/resolver/endpoint_addresses.h"
 
 // IWYU pragma: no_include <arpa/inet.h>
 // IWYU pragma: no_include <arpa/nameser.h>
