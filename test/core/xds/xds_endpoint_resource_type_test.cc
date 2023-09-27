@@ -22,6 +22,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include <google/protobuf/wrappers.pb.h>
 
@@ -491,7 +492,7 @@ TEST_F(XdsEndpointTest, MissingAddress) {
 }
 
 TEST_F(XdsEndpointTest, MultipleAddressesPerEndpoint) {
-  grpc_core::testing::ScopedExperimentalEnvVar env(
+  testing::ScopedExperimentalEnvVar env(
       "GRPC_EXPERIMENTAL_XDS_DUALSTACK_ENDPOINTS");
   ClusterLoadAssignment cla;
   cla.set_cluster_name("foo");
@@ -540,15 +541,15 @@ TEST_F(XdsEndpointTest, MultipleAddressesPerEndpoint) {
   ASSERT_TRUE(addr.ok()) << addr.status();
   EXPECT_EQ(*addr, "127.0.0.1:444");
   EXPECT_EQ(endpoint.args(), ChannelArgs()
-                                .Set(GRPC_ARG_ADDRESS_WEIGHT, 1)
-                                .Set(GRPC_ARG_XDS_HEALTH_STATUS,
-                                     XdsHealthStatus::HealthStatus::kUnknown));
+                                 .Set(GRPC_ARG_ADDRESS_WEIGHT, 1)
+                                 .Set(GRPC_ARG_XDS_HEALTH_STATUS,
+                                      XdsHealthStatus::HealthStatus::kUnknown));
   ASSERT_NE(resource.drop_config, nullptr);
   EXPECT_TRUE(resource.drop_config->drop_category_list().empty());
 }
 
 TEST_F(XdsEndpointTest, AdditionalAddressesMissingAddress) {
-  grpc_core::testing::ScopedExperimentalEnvVar env(
+  testing::ScopedExperimentalEnvVar env(
       "GRPC_EXPERIMENTAL_XDS_DUALSTACK_ENDPOINTS");
   ClusterLoadAssignment cla;
   cla.set_cluster_name("foo");
@@ -627,9 +628,9 @@ TEST_F(XdsEndpointTest, IgnoresMultipleAddressesPerEndpointWhenNotEnabled) {
   ASSERT_TRUE(addr.ok()) << addr.status();
   EXPECT_EQ(*addr, "127.0.0.1:443");
   EXPECT_EQ(endpoint.args(), ChannelArgs()
-                                .Set(GRPC_ARG_ADDRESS_WEIGHT, 1)
-                                .Set(GRPC_ARG_XDS_HEALTH_STATUS,
-                                     XdsHealthStatus::HealthStatus::kUnknown));
+                                 .Set(GRPC_ARG_ADDRESS_WEIGHT, 1)
+                                 .Set(GRPC_ARG_XDS_HEALTH_STATUS,
+                                      XdsHealthStatus::HealthStatus::kUnknown));
   ASSERT_NE(resource.drop_config, nullptr);
   EXPECT_TRUE(resource.drop_config->drop_category_list().empty());
 }

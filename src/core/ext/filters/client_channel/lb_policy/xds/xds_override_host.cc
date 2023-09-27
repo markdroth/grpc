@@ -19,7 +19,6 @@
 #include "src/core/ext/filters/client_channel/lb_policy/xds/xds_override_host.h"
 
 #include <inttypes.h>
-#include <stddef.h>
 #include <string.h>
 
 #include <algorithm>
