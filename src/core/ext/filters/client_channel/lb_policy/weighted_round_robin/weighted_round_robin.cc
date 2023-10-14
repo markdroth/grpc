@@ -1019,9 +1019,9 @@ class WeightedRoundRobin : public LoadBalancingPolicy {
     void MaybeUpdateWeight(double qps, double eps, double utilization,
                            float error_utilization_penalty);
 
-    std::pair<float, Duration> GetWeight(
-        Timestamp now, Duration weight_expiration_period,
-        Duration blackout_period);
+    std::pair<float, Duration> GetWeight(Timestamp now,
+                                         Duration weight_expiration_period,
+                                         Duration blackout_period);
 
     void ResetNonEmptySince();
 
@@ -1428,8 +1428,9 @@ size_t WeightedRoundRobin::Picker::PickIndex() {
     size_t index = scheduler->scheduler.Pick();
     if (!scheduler->endpoint_weight_staleness.empty()) {
       // FIXME: use per-channel metric API
-      gpr_log(GPR_INFO, "STALENESS: %s", scheduler->endpoint_weight_staleness[index].ToString().c_str());
-      //g_metric->AddToHistogram(scheduler->endpoint_weight_staleness[index]);
+      gpr_log(GPR_INFO, "STALENESS: %s",
+              scheduler->endpoint_weight_staleness[index].ToString().c_str());
+      // g_metric->AddToHistogram(scheduler->endpoint_weight_staleness[index]);
     }
     return index;
   }
