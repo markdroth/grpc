@@ -21,11 +21,11 @@
 
 #include "absl/strings/string_view.h"
 
+#include "src/proto/grpc/testing/xds/v3/cluster.pb.h"
+#include "src/proto/grpc/testing/xds/v3/endpoint.pb.h"
 #include "src/proto/grpc/testing/xds/v3/http_connection_manager.pb.h"
 #include "src/proto/grpc/testing/xds/v3/listener.pb.h"
 #include "src/proto/grpc/testing/xds/v3/route.pb.h"
-#include "src/proto/grpc/testing/xds/v3/cluster.pb.h"
-#include "src/proto/grpc/testing/xds/v3/endpoint.pb.h"
 #include "test/cpp/end2end/xds/xds_server.h"
 
 namespace grpc {
@@ -100,11 +100,13 @@ class XdsBootstrapBuilder {
 // Utilities for constructing xDS resources.
 class XdsResourceUtils {
  public:
-  using HttpConnectionManager = envoy::extensions::filters::network::http_connection_manager::v3::HttpConnectionManager;
+  using HttpConnectionManager = envoy::extensions::filters::network::
+      http_connection_manager::v3::HttpConnectionManager;
   using Listener = envoy::config::listener::v3::Listener;
   using RouteConfiguration = envoy::config::route::v3::RouteConfiguration;
   using Cluster = envoy::config::cluster::v3::Cluster;
-  using ClusterLoadAssignment = envoy::config::endpoint::v3::ClusterLoadAssignment;
+  using ClusterLoadAssignment =
+      envoy::config::endpoint::v3::ClusterLoadAssignment;
 
   // Interface for accessing HttpConnectionManager config in Listener.
   class HcmAccessor {
