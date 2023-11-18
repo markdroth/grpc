@@ -16,23 +16,26 @@
 
 #include <grpc/support/port_platform.h>
 
+#include <stddef.h>
+#include <stdint.h>
+
 #include <algorithm>
 #include <map>
 #include <memory>
 #include <set>
 #include <string>
-#include <type_traits>
 #include <utility>
 #include <vector>
 
+#include "absl/functional/function_ref.h"
 #include "absl/status/status.h"
 #include "absl/status/statusor.h"
 #include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
 #include "absl/strings/string_view.h"
 #include "absl/types/optional.h"
 #include "absl/types/variant.h"
 
-#include <grpc/grpc_security.h>
 #include <grpc/impl/connectivity_state.h>
 #include <grpc/support/json.h>
 #include <grpc/support/log.h>
@@ -41,21 +44,20 @@
 #include "src/core/ext/filters/client_channel/lb_policy/outlier_detection/outlier_detection.h"
 #include "src/core/ext/filters/client_channel/lb_policy/xds/xds_channel_args.h"
 #include "src/core/ext/filters/client_channel/resolver/xds/xds_config.h"
-#include "src/core/ext/xds/certificate_provider_store.h"
+#include "src/core/ext/xds/xds_client_stats.h"
 #include "src/core/ext/xds/xds_cluster.h"
-#include "src/core/ext/xds/xds_common_types.h"
+#include "src/core/ext/xds/xds_endpoint.h"
 #include "src/core/ext/xds/xds_health_status.h"
 #include "src/core/lib/channel/channel_args.h"
 #include "src/core/lib/config/core_configuration.h"
 #include "src/core/lib/debug/trace.h"
-#include "src/core/lib/gprpp/debug_location.h"
-#include "src/core/lib/gprpp/match.h"
+#include "src/core/lib/gprpp/no_destruct.h"
 #include "src/core/lib/gprpp/orphanable.h"
 #include "src/core/lib/gprpp/ref_counted_ptr.h"
+#include "src/core/lib/gprpp/ref_counted_string.h"
 #include "src/core/lib/gprpp/time.h"
-#include "src/core/lib/gprpp/unique_type_name.h"
-#include "src/core/lib/gprpp/work_serializer.h"
 #include "src/core/lib/iomgr/pollset_set.h"
+#include "src/core/lib/iomgr/resolved_address.h"
 #include "src/core/lib/json/json.h"
 #include "src/core/lib/json/json_args.h"
 #include "src/core/lib/json/json_object_loader.h"
@@ -64,6 +66,7 @@
 #include "src/core/lib/load_balancing/lb_policy.h"
 #include "src/core/lib/load_balancing/lb_policy_factory.h"
 #include "src/core/lib/load_balancing/lb_policy_registry.h"
+#include "src/core/lib/resolver/endpoint_addresses.h"
 
 namespace grpc_core {
 
@@ -263,8 +266,7 @@ absl::Status CdsLb::UpdateLocked(UpdateArgs args) {
   if (!child_config.ok()) {
     // Should never happen.
     absl::Status status = absl::InternalError(
-        absl::StrCat(cluster_name_,
-                     ": error parsing child policy config: ",
+        absl::StrCat(cluster_name_, ": error parsing child policy config: ",
                      child_config.status().message()));
     ReportTransientFailure(status);
     return status;
@@ -276,10 +278,8 @@ absl::Status CdsLb::UpdateLocked(UpdateArgs args) {
     lb_args.args = args.args;
     lb_args.channel_control_helper = std::make_unique<Helper>(Ref());
     child_policy_ =
-        CoreConfiguration::Get()
-            .lb_policy_registry()
-            .CreateLoadBalancingPolicy((*child_config)->name(),
-                                       std::move(lb_args));
+        CoreConfiguration::Get().lb_policy_registry().CreateLoadBalancingPolicy(
+            (*child_config)->name(), std::move(lb_args));
     if (child_policy_ == nullptr) {
       // Should never happen.
       absl::Status status = absl::UnavailableError(
@@ -390,7 +390,7 @@ std::vector<CdsLb::ChildNameState> CdsLb::ComputeChildNames(
       if (!child_number.has_value()) {
         for (child_number = new_numbers.next_available_child_number;
              mappings.child_locality_map.find(*child_number) !=
-                 mappings.child_locality_map.end();
+             mappings.child_locality_map.end();
              ++(*child_number)) {
         }
         new_numbers.next_available_child_number = *child_number + 1;
@@ -498,40 +498,39 @@ Json CdsLb::CreateChildPolicyConfig(
         if (outlier_detection_update.success_rate_ejection.has_value()) {
           outlier_detection_config["successRateEjection"] = Json::FromObject({
               {"stdevFactor",
-               Json::FromNumber(
-                   outlier_detection_update.success_rate_ejection
-                       ->stdev_factor)},
+               Json::FromNumber(outlier_detection_update.success_rate_ejection
+                                    ->stdev_factor)},
               {"enforcementPercentage",
                Json::FromNumber(outlier_detection_update.success_rate_ejection
                                     ->enforcement_percentage)},
               {"minimumHosts",
-               Json::FromNumber(
-                   outlier_detection_update.success_rate_ejection
-                       ->minimum_hosts)},
+               Json::FromNumber(outlier_detection_update.success_rate_ejection
+                                    ->minimum_hosts)},
               {"requestVolume",
-               Json::FromNumber(
-                   outlier_detection_update.success_rate_ejection
-                       ->request_volume)},
+               Json::FromNumber(outlier_detection_update.success_rate_ejection
+                                    ->request_volume)},
           });
         }
         if (outlier_detection_update.failure_percentage_ejection.has_value()) {
-          outlier_detection_config["failurePercentageEjection"] = Json::FromObject({
-              {"threshold",
-               Json::FromNumber(outlier_detection_update
-                                    .failure_percentage_ejection->threshold)},
-              {"enforcementPercentage",
-               Json::FromNumber(
-                   outlier_detection_update.failure_percentage_ejection
-                       ->enforcement_percentage)},
-              {"minimumHosts",
-               Json::FromNumber(outlier_detection_update
-                                    .failure_percentage_ejection
-                                    ->minimum_hosts)},
-              {"requestVolume",
-               Json::FromNumber(outlier_detection_update
-                                    .failure_percentage_ejection
-                                    ->request_volume)},
-          });
+          outlier_detection_config["failurePercentageEjection"] =
+              Json::FromObject({
+                  {"threshold",
+                   Json::FromNumber(
+                       outlier_detection_update.failure_percentage_ejection
+                           ->threshold)},
+                  {"enforcementPercentage",
+                   Json::FromNumber(
+                       outlier_detection_update.failure_percentage_ejection
+                           ->enforcement_percentage)},
+                  {"minimumHosts",
+                   Json::FromNumber(
+                       outlier_detection_update.failure_percentage_ejection
+                           ->minimum_hosts)},
+                  {"requestVolume",
+                   Json::FromNumber(
+                       outlier_detection_update.failure_percentage_ejection
+                           ->request_volume)},
+              });
         }
       }
       outlier_detection_config["childPolicy"] =
@@ -566,8 +565,8 @@ Json CdsLb::CreateChildPolicyConfig(
        })},
   })});
   if (GRPC_TRACE_FLAG_ENABLED(grpc_cds_lb_trace)) {
-    gpr_log(GPR_INFO, "[cdslb %p] generated config for child policy: %s",
-            this, JsonDump(json, /*indent=*/1).c_str());
+    gpr_log(GPR_INFO, "[cdslb %p] generated config for child policy: %s", this,
+            JsonDump(json, /*indent=*/1).c_str());
   }
   return json;
 }
@@ -579,10 +578,9 @@ class PriorityEndpointIterator : public EndpointAddressesIterator {
     std::shared_ptr<const XdsEndpointResource> endpoints;
     std::vector<size_t /*child_number*/> priority_child_numbers;
 
-    ClusterEntry(
-        std::string cluster,
-        std::shared_ptr<const XdsEndpointResource> resource,
-        std::vector<size_t> child_numbers)
+    ClusterEntry(std::string cluster,
+                 std::shared_ptr<const XdsEndpointResource> resource,
+                 std::vector<size_t> child_numbers)
         : cluster_name(std::move(cluster)),
           endpoints(std::move(resource)),
           priority_child_numbers(std::move(child_numbers)) {}
