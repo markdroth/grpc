@@ -34,6 +34,7 @@
 #include "absl/types/optional.h"
 #include "absl/types/variant.h"
 
+#include <grpc/grpc_security.h>
 #include <grpc/impl/connectivity_state.h>
 #include <grpc/support/log.h>
 
@@ -41,11 +42,15 @@
 #include "src/core/ext/filters/client_channel/lb_policy/child_policy_handler.h"
 #include "src/core/ext/filters/client_channel/lb_policy/xds/xds_channel_args.h"
 #include "src/core/ext/filters/client_channel/resolver/xds/xds_config.h"
+#include "src/core/ext/xds/certificate_provider_store.h"
 #include "src/core/ext/xds/xds_bootstrap.h"
 #include "src/core/ext/xds/xds_bootstrap_grpc.h"
+#include "src/core/ext/xds/xds_certificate_provider.h"
 #include "src/core/ext/xds/xds_client.h"
 #include "src/core/ext/xds/xds_client_grpc.h"
 #include "src/core/ext/xds/xds_client_stats.h"
+#include "src/core/ext/xds/xds_cluster.h"
+#include "src/core/ext/xds/xds_common_types.h"
 #include "src/core/ext/xds/xds_endpoint.h"
 #include "src/core/lib/channel/channel_args.h"
 #include "src/core/lib/config/core_configuration.h"
@@ -55,6 +60,7 @@
 #include "src/core/lib/gprpp/ref_counted.h"
 #include "src/core/lib/gprpp/ref_counted_ptr.h"
 #include "src/core/lib/gprpp/sync.h"
+#include "src/core/lib/gprpp/unique_type_name.h"
 #include "src/core/lib/gprpp/validation_errors.h"
 #include "src/core/lib/iomgr/pollset_set.h"
 #include "src/core/lib/iomgr/resolved_address.h"
@@ -66,7 +72,11 @@
 #include "src/core/lib/load_balancing/lb_policy_factory.h"
 #include "src/core/lib/load_balancing/lb_policy_registry.h"
 #include "src/core/lib/load_balancing/subchannel_interface.h"
+#include "src/core/lib/matchers/matchers.h"
 #include "src/core/lib/resolver/endpoint_addresses.h"
+#include "src/core/lib/security/credentials/credentials.h"
+#include "src/core/lib/security/credentials/tls/grpc_tls_certificate_distributor.h"
+#include "src/core/lib/security/credentials/tls/grpc_tls_certificate_provider.h"
 #include "src/core/lib/security/credentials/xds/xds_credentials.h"
 #include "src/core/lib/transport/connectivity_state.h"
 
@@ -469,8 +479,7 @@ void XdsClusterImplLb::ShutdownLocked() {
   // Clean up cert provider state.
   if (root_certificate_provider_ != nullptr) {
     grpc_pollset_set_del_pollset_set(
-        interested_parties(),
-        root_certificate_provider_->interested_parties());
+        interested_parties(), root_certificate_provider_->interested_parties());
     root_certificate_provider_.reset();
   }
   if (identity_certificate_provider_ != nullptr) {
@@ -564,9 +573,8 @@ absl::StatusOr<const XdsClusterResource*> FindClusterConfig(
   if (it != xds_config.clusters.end()) {
     if (!it->second.ok()) {
       // Shouldn't happen.
-      return absl::InternalError(
-          absl::StrCat("xDS config does not contain entry for cluster ",
-                       cluster_name));
+      return absl::InternalError(absl::StrCat(
+          "xDS config does not contain entry for cluster ", cluster_name));
     }
     return it->second->front().cluster.get();
   }
@@ -580,9 +588,8 @@ absl::StatusOr<const XdsClusterResource*> FindClusterConfig(
       if (cluster.cluster_name == cluster_name) return cluster.cluster.get();
     }
   }
-  return absl::InternalError(
-      absl::StrCat("xDS config does not contain entry for cluster ",
-                   cluster_name));
+  return absl::InternalError(absl::StrCat(
+      "xDS config does not contain entry for cluster ", cluster_name));
 }
 
 absl::Status XdsClusterImplLb::MaybeConfigureCertificateProviderLocked(
@@ -599,10 +606,12 @@ absl::Status XdsClusterImplLb::MaybeConfigureCertificateProviderLocked(
   if (!cluster_resource.ok()) return cluster_resource.status();
   // Configure root cert.
   absl::string_view root_provider_instance_name =
-      (*cluster_resource)->common_tls_context.certificate_validation_context
+      (*cluster_resource)
+          ->common_tls_context.certificate_validation_context
           .ca_certificate_provider_instance.instance_name;
   absl::string_view root_provider_cert_name =
-      (*cluster_resource)->common_tls_context.certificate_validation_context
+      (*cluster_resource)
+          ->common_tls_context.certificate_validation_context
           .ca_certificate_provider_instance.certificate_name;
   RefCountedPtr<XdsCertificateProvider> new_root_provider;
   if (!root_provider_instance_name.empty()) {
@@ -636,10 +645,11 @@ absl::Status XdsClusterImplLb::MaybeConfigureCertificateProviderLocked(
           : root_certificate_provider_->distributor());
   // Configure identity cert.
   absl::string_view identity_provider_instance_name =
-      (*cluster_resource)->common_tls_context.tls_certificate_provider_instance
-          .instance_name;
+      (*cluster_resource)
+          ->common_tls_context.tls_certificate_provider_instance.instance_name;
   absl::string_view identity_provider_cert_name =
-      (*cluster_resource)->common_tls_context.tls_certificate_provider_instance
+      (*cluster_resource)
+          ->common_tls_context.tls_certificate_provider_instance
           .certificate_name;
   RefCountedPtr<XdsCertificateProvider> new_identity_provider;
   if (!identity_provider_instance_name.empty()) {
@@ -673,7 +683,8 @@ absl::Status XdsClusterImplLb::MaybeConfigureCertificateProviderLocked(
           : identity_certificate_provider_->distributor());
   // Configure SAN matchers.
   const std::vector<StringMatcher>& match_subject_alt_names =
-      (*cluster_resource)->common_tls_context.certificate_validation_context
+      (*cluster_resource)
+          ->common_tls_context.certificate_validation_context
           .match_subject_alt_names;
   xds_certificate_provider_->UpdateSubjectAlternativeNameMatchers(
       config_->cluster_name(), match_subject_alt_names);
