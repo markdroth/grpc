@@ -520,9 +520,8 @@ TEST_P(AggregateClusterTest, SameClusterAtTopAndUnderAggregateCluster) {
   CheckRpcSendOk(DEBUG_LOCATION);
   // Send another RPC with the header "cluster=aggregate", which will go
   // to kAggregateClusterName.
-  CheckRpcSendOk(
-      DEBUG_LOCATION, 1,
-      RpcOptions().set_metadata({{"cluster", "aggregate"}}));
+  CheckRpcSendOk(DEBUG_LOCATION, 1,
+                 RpcOptions().set_metadata({{"cluster", "aggregate"}}));
   // Backend should have received 2 RPCs.
   EXPECT_EQ(backends_[0]->backend_service()->request_count(), 2);
   // Both RPCs should have been from the same client due to subchannel sharing.
