@@ -491,6 +491,44 @@ TEST_P(AggregateClusterTest, MultipleClustersWithSameLocalities) {
   WaitForBackend(DEBUG_LOCATION, 1);
 }
 
+TEST_P(AggregateClusterTest, SameClusterAtTopAndUnderAggregateCluster) {
+  const char* kAggregateClusterName = "aggregate_cluster";
+  CreateAndStartBackends(1);
+  // Populate EDS resource.
+  EdsResourceArgs args1({{"locality0", {CreateEndpointsForBackends()}}});
+  balancer_->ads_service()->SetEdsResource(BuildEdsResource(args1));
+  // Populate aggregate cluster resource.
+  auto cluster = default_cluster_;
+  cluster.set_name(kAggregateClusterName);
+  CustomClusterType* custom_cluster = cluster.mutable_cluster_type();
+  custom_cluster->set_name("envoy.clusters.aggregate");
+  ClusterConfig cluster_config;
+  cluster_config.add_clusters(kDefaultClusterName);
+  custom_cluster->mutable_typed_config()->PackFrom(cluster_config);
+  balancer_->ads_service()->SetCdsResource(cluster);
+  // Set route config that contains routes for both kDefaultClusterName and
+  // kAggregateClusterName.
+  auto route_config = default_route_config_;
+  auto* route = route_config.mutable_virtual_hosts(0)->mutable_routes(0);
+  *route_config.mutable_virtual_hosts(0)->add_routes() = *route;
+  auto* header_matcher = route->mutable_match()->add_headers();
+  header_matcher->set_name("cluster");
+  header_matcher->set_exact_match("aggregate");
+  route->mutable_route()->set_cluster(kAggregateClusterName);
+  SetRouteConfiguration(balancer_.get(), route_config);
+  // Send one RPC to the default route, which will go to kDefaultClusterName.
+  CheckRpcSendOk(DEBUG_LOCATION);
+  // Send another RPC with the header "cluster=aggregate", which will go
+  // to kAggregateClusterName.
+  CheckRpcSendOk(
+      DEBUG_LOCATION, 1,
+      RpcOptions().set_metadata({{"cluster", "aggregate"}}));
+  // Backend should have received 2 RPCs.
+  EXPECT_EQ(backends_[0]->backend_service()->request_count(), 2);
+  // Both RPCs should have been from the same client due to subchannel sharing.
+  EXPECT_EQ(backends_[0]->backend_service()->clients().size(), 1);
+}
+
 // This tests a bug seen in the wild where the cds LB policy was
 // incorrectly modifying its copy of the XdsClusterResource for the root
 // cluster when generating the child policy config, so when we later
