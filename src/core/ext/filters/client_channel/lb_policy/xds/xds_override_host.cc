@@ -247,9 +247,8 @@ class XdsOverrideHostLb : public LoadBalancingPolicy {
 
    private:
     RefCountedPtr<XdsOverrideHostLb> policy_;
-    std::atomic<grpc_connectivity_state> connectivity_state_{
-        GRPC_CHANNEL_IDLE};
-// FIXME: add lock annotations for all three!
+    std::atomic<grpc_connectivity_state> connectivity_state_{GRPC_CHANNEL_IDLE};
+    // FIXME: add lock annotations for all three!
     absl::variant<WeakRefCountedPtr<SubchannelWrapper>,
                   RefCountedPtr<SubchannelWrapper>>
         subchannel_;
