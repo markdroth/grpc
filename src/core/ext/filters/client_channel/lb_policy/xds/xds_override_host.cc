@@ -183,7 +183,7 @@ class XdsOverrideHostLb : public LoadBalancingPolicy {
     std::set<std::unique_ptr<ConnectivityStateWatcherInterface>,
              PtrLessThan<ConnectivityStateWatcherInterface>>
         watchers_;
-// FIXME: move to SubchannelEntry
+    // FIXME: move to SubchannelEntry
     std::atomic<grpc_connectivity_state> connectivity_state_ = {
         GRPC_CHANNEL_IDLE};
   };
@@ -245,7 +245,7 @@ class XdsOverrideHostLb : public LoadBalancingPolicy {
 
    private:
     RefCountedPtr<XdsOverrideHostLb> policy_;
-// FIXME: add lock annotations for all three!
+    // FIXME: add lock annotations for all three!
     absl::variant<WeakRefCountedPtr<SubchannelWrapper>,
                   RefCountedPtr<SubchannelWrapper>>
         subchannel_;
