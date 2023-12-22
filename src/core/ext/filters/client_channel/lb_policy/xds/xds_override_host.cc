@@ -183,7 +183,7 @@ class XdsOverrideHostLb : public LoadBalancingPolicy {
     std::set<std::unique_ptr<ConnectivityStateWatcherInterface>,
              PtrLessThan<ConnectivityStateWatcherInterface>>
         watchers_;
-// FIXME: move to SubchannelEntry
+    // FIXME: move to SubchannelEntry
     std::atomic<grpc_connectivity_state> connectivity_state_ = {
         GRPC_CHANNEL_IDLE};
   };
@@ -245,7 +245,7 @@ class XdsOverrideHostLb : public LoadBalancingPolicy {
 
    private:
     RefCountedPtr<XdsOverrideHostLb> policy_;
-// FIXME: add lock annotations for all three!
+    // FIXME: add lock annotations for all three!
     absl::variant<WeakRefCountedPtr<SubchannelWrapper>,
                   RefCountedPtr<SubchannelWrapper>>
         subchannel_;
@@ -464,7 +464,7 @@ LoadBalancingPolicy::PickResult XdsOverrideHostLb::Picker::Pick(PickArgs args) {
     // Populate the address list in the override host attribute so that
     // the StatefulSession filter can set the cookie.
     if (override_host_attr != nullptr) {
-// FIXME: this needs the lock!
+      // FIXME: this needs the lock!
       override_host_attr->set_actual_address_list(wrapper->address_list());
     }
     // Unwrap the subchannel.
