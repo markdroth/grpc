@@ -956,7 +956,7 @@ static bool tcp_do_read(grpc_tcp* tcp, grpc_error_handle* error)
         *error = absl::UnavailableError("Socket closed");
       } else {
         *error = absl::UnavailableError(
-            absl::StrCat( "recvmsg:", grpc_core::StrError(errno)));
+            absl::StrCat("recvmsg:", grpc_core::StrError(errno)));
       }
       return true;
     }
@@ -1816,11 +1816,10 @@ static void tcp_write(grpc_endpoint* ep, grpc_slice_buffer* buf,
   GPR_DEBUG_ASSERT(tcp->current_zerocopy_send == nullptr);
 
   if (buf->length == 0) {
-    grpc_core::Closure::Run(
-        DEBUG_LOCATION, cb,
-        grpc_fd_is_shutdown(tcp->em_fd)
-            ? absl::UnavailableError("EOF")
-            : absl::OkStatus());
+    grpc_core::Closure::Run(DEBUG_LOCATION, cb,
+                            grpc_fd_is_shutdown(tcp->em_fd)
+                                ? absl::UnavailableError("EOF")
+                                : absl::OkStatus());
     tcp_shutdown_buffer_list(tcp);
     return;
   }
