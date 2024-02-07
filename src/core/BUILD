@@ -51,7 +51,7 @@ grpc_cc_library(
 grpc_cc_library(
     name = "channel_interface",
     hdrs = [
-        "lib/surface/channel_interface.h"
+        "lib/surface/channel_interface.h",
     ],
     external_deps = [
         "absl/functional:any_invocable",
