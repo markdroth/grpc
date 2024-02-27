@@ -43,9 +43,9 @@ class AsyncUInt64MetricReporter {
  public:
   virtual ~AsyncUInt64MetricReporter() = default;
 
-  virtual void Report(
-      uint64_t value, absl::Span<const absl::string_view> label_values,
-      absl::Span<const absl::string_view> optional_values) = 0;
+  virtual void Report(uint64_t value,
+                      absl::Span<const absl::string_view> label_values,
+                      absl::Span<const absl::string_view> optional_values) = 0;
 };
 
 // An interface for implementing callback-style double metrics.
@@ -54,9 +54,9 @@ class AsyncDoubleMetricReporter {
  public:
   virtual ~AsyncDoubleMetricReporter() = default;
 
-  virtual void Report(
-      double value, absl::Span<const absl::string_view> label_values,
-      absl::Span<const absl::string_view> optional_values) = 0;
+  virtual void Report(double value,
+                      absl::Span<const absl::string_view> label_values,
+                      absl::Span<const absl::string_view> optional_values) = 0;
 };
 
 // A global registry of instruments(metrics). This API is designed to be used
