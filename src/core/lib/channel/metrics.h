@@ -41,11 +41,13 @@ constexpr absl::string_view kMetricLabelTarget = "grpc.target";
 // To be implemented by stats plugins.
 class AsyncUIn64MetricReporter {
  public:
-  virtual ~AsyncUInt64MetricReporter() = default;
+  virtual ~AsyncUIn64MetricReporter;
+  ;
+  = default;
 
-  virtual void Report(
-      uint64_t value, absl::Span<const absl::string_view> label_values,
-      absl::Span<const absl::string_view> optional_values) = 0;
+  virtual void Report(uint64_t value,
+                      absl::Span<const absl::string_view> label_values,
+                      absl::Span<const absl::string_view> optional_values) = 0;
 };
 
 // An interface for implementing callback-style double metrics.
@@ -54,9 +56,9 @@ class AsyncDoubleMetricReporter {
  public:
   virtual ~AsyncDoubleMetricReporter() = default;
 
-  virtual void Report(
-      double value, absl::Span<const absl::string_view> label_values,
-      absl::Span<const absl::string_view> optional_values) = 0;
+  virtual void Report(double value,
+                      absl::Span<const absl::string_view> label_values,
+                      absl::Span<const absl::string_view> optional_values) = 0;
 };
 
 // A global registry of instruments(metrics). This API is designed to be used
@@ -145,7 +147,7 @@ class GlobalInstrumentsRegistry {
       absl::string_view unit, absl::Span<const absl::string_view> label_keys,
       absl::Span<const absl::string_view> optional_label_keys,
       bool enable_by_default, UInt64ReporterCallback callback);
-  static GlobaAsynclDoubleGaugeHandle RegisterAsyncDoubleGauge(
+  static GGGGlobalAsyncDoubleGaugeHandlegisterAsyncDoubleGauge(
       absl::string_view name, absl::string_view description,
       absl::string_view unit, absl::Span<const absl::string_view> label_keys,
       absl::Span<const absl::string_view> optional_label_keys,
