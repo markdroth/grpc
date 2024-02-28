@@ -588,10 +588,10 @@ class XdsClientTest : public ::testing::Test {
 
   class MetricsReporter : public XdsMetricsReporter {
    public:
-    void ReportResourceUpdates(
-        absl::string_view /*xds_server*/, absl::string_view /*resource_type*/,
-        uint64_t /*count*/) override {
-// FIXME: add tests for metrics
+    void ReportResourceUpdates(absl::string_view /*xds_server*/,
+                               absl::string_view /*resource_type*/,
+                               uint64_t /*count*/) override {
+      // FIXME: add tests for metrics
     }
   };
 
