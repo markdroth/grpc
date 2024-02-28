@@ -201,7 +201,7 @@ TEST_F(MetricsTest, UInt64Gauge) {
   const absl::string_view kLabelKeys[] = {"label_key_1", "label_key_2"};
   const absl::string_view kOptionalLabelKeys[] = {"optional_label_key_1",
                                                   "optional_label_key_2"};
-  auto uint64_gauge_handle = GlobalInstrumentsRegistry::RegisterUInt64Gauge(
+  auto uint64_gauge_handle = GlobalInstrumentsRegistry::RegisterInt64Gauge(
       "uint64_gauge", "A simple uint64 gauge.", "unit", kLabelKeys,
       kOptionalLabelKeys, true);
   constexpr absl::string_view kLabelValues[] = {"label_value_1",
