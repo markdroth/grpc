@@ -26,9 +26,9 @@ class XdsMetricsReporter {
  public:
   virtual ~XdsMetricsReporter() = default;
 
-  virtual void ReportResourceUpdates(
-      absl::string_view xds_server, absl::string_view resource_type,
-      uint64_t count) = 0;
+  virtual void ReportResourceUpdates(absl::string_view xds_server,
+                                     absl::string_view resource_type,
+                                     uint64_t count) = 0;
 };
 
 }  // namespace grpc_core
