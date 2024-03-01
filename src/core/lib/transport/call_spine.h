@@ -229,10 +229,10 @@ class CallInitiator {
   explicit CallInitiator(RefCountedPtr<CallSpineInterface> spine)
       : spine_(std::move(spine)) {}
 
-// FIXME: should this method go away, since we now want this to be
-// handled in UnstartedCallHandler instead?
-// Note: this would require changing ServerTransport::AcceptCall() to
-// act like a CallDestination
+  // FIXME: should this method go away, since we now want this to be
+  // handled in UnstartedCallHandler instead?
+  // Note: this would require changing ServerTransport::AcceptCall() to
+  // act like a CallDestination
   auto PushClientInitialMetadata(ClientMetadataHandle md) {
     GPR_DEBUG_ASSERT(GetContext<Activity>() == &spine_->party());
     return Map(spine_->client_initial_metadata().sender.Push(std::move(md)),
@@ -477,7 +477,7 @@ class UnstartedCallHandler {
 
   template <typename ContextType>
   void SetContext(ContextType context) {
-// FIXME: implement
+    // FIXME: implement
   }
 
   template <typename Promise>

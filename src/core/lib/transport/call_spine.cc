@@ -92,16 +92,16 @@ void ForwardCall(CallHandler call_handler, CallInitiator call_initiator) {
 CallHandler UnstartedCallHandler::StartCall(
     RefCountedPtr<CallFilters::Stack> stack,
     RefCountedPtr<CallDestination> call_destination) {
-   call_initiator->SpawnGuarded(
-       "send_initial_metadata",
-       [client_initial_metadata = std::move(client_initial_metadata_),
-        spine = spine_]() mutable {
-         GPR_DEBUG_ASSERT(GetContext<Activity>() == &spine->party());
-         return Map(spine_->client_initial_metadata().sender.Push(
-                        std::move(client_initial_metadata)),
-                    [](bool ok) { return StatusFlag(ok); });
-       });
-// FIXME: attach stack and destination to CallHandler
+  call_initiator->SpawnGuarded(
+      "send_initial_metadata",
+      [client_initial_metadata = std::move(client_initial_metadata_),
+       spine = spine_]() mutable {
+        GPR_DEBUG_ASSERT(GetContext<Activity>() == &spine->party());
+        return Map(spine_->client_initial_metadata().sender.Push(
+                       std::move(client_initial_metadata)),
+                   [](bool ok) { return StatusFlag(ok); });
+      });
+  // FIXME: attach stack and destination to CallHandler
   return CallHandler(std::move(spine_));
 }
 
