@@ -229,10 +229,10 @@ class CallInitiator {
   explicit CallInitiator(RefCountedPtr<CallSpineInterface> spine)
       : spine_(std::move(spine)) {}
 
-// FIXME: should this method go away, since we now want this to be
-// handled in UnstartedCallHandler instead?
-// Note: this would require changing ServerTransport::AcceptCall() to
-// act like a CallDestination
+  // FIXME: should this method go away, since we now want this to be
+  // handled in UnstartedCallHandler instead?
+  // Note: this would require changing ServerTransport::AcceptCall() to
+  // act like a CallDestination
   auto PushClientInitialMetadata(ClientMetadataHandle md) {
     GPR_DEBUG_ASSERT(GetContext<Activity>() == &spine_->party());
     return Map(spine_->client_initial_metadata().sender.Push(std::move(md)),
@@ -330,7 +330,7 @@ class CallHandler {
 
   template <typename ContextType>
   void SetContext(ContextType context) {
-// FIXME: implement
+    // FIXME: implement
   }
 
   auto PullClientInitialMetadata() {
@@ -467,15 +467,15 @@ class UnstartedCallHandler {
   UnstartedCallHandler(RefCountedPtr<CallSpineInterface> spine,
                        ClientMetadataHandle client_initial_metadata)
       : spine_(std::move(spine)) {
-   spine_->SpawnGuarded(
-       "send_initial_metadata",
-       [client_initial_metadata = std::move(client_initial_metadata),
-        spine = spine_]() mutable {
-         GPR_DEBUG_ASSERT(GetContext<Activity>() == &spine->party());
-         return Map(spine->client_initial_metadata().sender.Push(
-                        std::move(client_initial_metadata)),
-                    [](bool ok) { return StatusFlag(ok); });
-       });
+    spine_->SpawnGuarded(
+        "send_initial_metadata",
+        [client_initial_metadata = std::move(client_initial_metadata),
+         spine = spine_]() mutable {
+          GPR_DEBUG_ASSERT(GetContext<Activity>() == &spine->party());
+          return Map(spine->client_initial_metadata().sender.Push(
+                         std::move(client_initial_metadata)),
+                     [](bool ok) { return StatusFlag(ok); });
+        });
   }
 
   // Returns the client initial metadata, which has not yet been
@@ -489,7 +489,7 @@ class UnstartedCallHandler {
 
   template <typename ContextType>
   void SetContext(ContextType context) {
-// FIXME: implement
+    // FIXME: implement
   }
 
   template <typename Promise>

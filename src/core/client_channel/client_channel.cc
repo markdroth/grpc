@@ -856,7 +856,7 @@ class ClientChannel::LoadBalancedCallDestination : public CallDestination {
                 // Delegate to connected subchannel.
 // FIXME: need to insert LbCallTracingFilter at the top of the stack
                 (*connected_subchannel)->StartCall(
-                    std::move(unstarted_handler));
+                    unstarted_handler);
                 return absl::OkStatus();
               });
         });
