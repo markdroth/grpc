@@ -90,15 +90,15 @@ void ForwardCall(CallHandler call_handler, CallInitiator call_initiator) {
 }
 
 ClientMetadataHandle& UnstartedCallHandler::UnprocessedClientInitialMetadata() {
-// FIXME: implement a way to peek at the unprocessed client initial metadata
-// (the code here now is just a placeholder to get this to build)
+  // FIXME: implement a way to peek at the unprocessed client initial metadata
+  // (the code here now is just a placeholder to get this to build)
   static ClientMetadataHandle md;
   return md;
 }
 
 CallHandler UnstartedCallHandler::StartCall(
     RefCountedPtr<CallFilters::Stack> stack) {
-// FIXME: attach stack to CallHandler
+  // FIXME: attach stack to CallHandler
   return CallHandler(std::move(spine_));
 }
 
