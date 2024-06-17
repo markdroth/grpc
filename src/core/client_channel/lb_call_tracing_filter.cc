@@ -32,7 +32,7 @@ const grpc_channel_filter LbCallTracingFilter::kFilter =
     MakePromiseBasedFilter<LbCallTracingFilter, FilterEndpoint::kClient,
                            kFilterExaminesServerInitialMetadata |
                                kFilterExaminesOutboundMessages>(
-                               "lb_call_tracer");
+        "lb_call_tracer");
 
 const NoInterceptor LbCallTracingFilter::Call::OnServerToClientMessage;
 
@@ -71,8 +71,7 @@ namespace {
 class BackendMetricAccessor
     : public LoadBalancingPolicy::BackendMetricAccessor {
  public:
-  explicit BackendMetricAccessor(
-      grpc_metadata_batch* server_trailing_metadata)
+  explicit BackendMetricAccessor(grpc_metadata_batch* server_trailing_metadata)
       : server_trailing_metadata_(server_trailing_metadata) {}
 
   ~BackendMetricAccessor() override {
@@ -113,7 +112,7 @@ class BackendMetricAccessor
 // TODO(ctiller): This can't be inlined in a method of
 // LbCallTracingFilter::Call without a redundant namespace qualifier,
 // because in that scope, GetContext<Call> is interpreted as meaning
-// LbCallTracingFilter::Call instead of grpc_core::Call.
+// LbCallTracingFilter::Call instead of Call.
 #if 0
 grpc_call_stats* GetCallStats() { return GetContext<Call>()->call_stats(); }
 #endif
@@ -169,8 +168,8 @@ void LbCallTracingFilter::Call::OnFinalize(const grpc_call_final_info*) {
 }
 
 void RegisterLbCallTracingFilter(CoreConfiguration::Builder* builder) {
-  builder->channel_init()
-      ->RegisterFilter<LbCallTracingFilter>(GRPC_CLIENT_SUBCHANNEL)
+  builder->channel_init()->RegisterFilter<LbCallTracingFilter>(
+      GRPC_CLIENT_SUBCHANNEL)
       // FIXME: make sure it's at the top of the stack!
       ;
 }
