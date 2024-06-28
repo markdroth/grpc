@@ -628,8 +628,7 @@ class LoadBalancingPolicyTest : public ::testing::Test {
       return it->second;
     }
 
-    std::vector<std::pair<std::string, std::string>> TestOnlyCopyToVector()
-        override {
+    std::vector<std::pair<std::string, std::string>> TestOnlyCopyToVector() {
       return {};  // Not used.
     }
 
