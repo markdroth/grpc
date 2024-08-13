@@ -90,7 +90,7 @@ void XdsClusterDropStats::AddCallDropped(const std::string& category) {
 
 // TODO(roth): Remove this once the feature passes interop tests.
 bool XdsOrcaLrsPropagationChangesEnabled() {
-  auto value = GetEnv("GRPC_EXPERIMENTAL_XDS_ORCA_LRS_PROPAGATION");
+  auto value = getenv("GRPC_EXPERIMENTAL_XDS_ORCA_LRS_PROPAGATION");
   if (!value.has_value()) return false;
   bool parsed_value;
   bool parse_succeeded = gpr_parse_bool_value(value->c_str(), &parsed_value);
@@ -145,11 +145,14 @@ XdsClusterLocalityStats::GetSnapshotAndReset() {
         percpu_stats.total_requests_in_progress.load(std::memory_order_relaxed),
         GetAndResetCounter(&percpu_stats.total_error_requests),
         GetAndResetCounter(&percpu_stats.total_issued_requests),
-        {}, {}, {}, {}};
+        {},
+        {},
+        {},
+        {}};
     {
       MutexLock lock(&percpu_stats.backend_metrics_mu);
       percpu_snapshot.cpu_utilization = std::move(percpu_stats.cpu_utilization);
-      permem_snapshot.mem_utilization = std::move(permem_stats.mem_utilization);
+      percpu_snapshot.mem_utilization = std::move(permem_stats.mem_utilization);
       perapplication_snapshot.application_utilization =
           std::move(perapplication_stats.application_utilization);
       percpu_snapshot.backend_metrics = std::move(percpu_stats.backend_metrics);
@@ -167,7 +170,7 @@ void XdsClusterLocalityStats::AddCallStarted() {
 
 void XdsClusterLocalityStats::AddCallFinished(
     const BackendMetricPropagation& propagation,
-    const BackendMetricData* backend_metrics, bool fail) {
+    const BackendMetric* backend_metrics, bool fail) {
   Stats& stats = stats_.this_cpu();
   std::atomic<uint64_t>& to_increment =
       fail ? stats.total_error_requests : stats.total_successful_requests;
@@ -198,7 +201,7 @@ void XdsClusterLocalityStats::AddCallFinished(
           BackendMetricPropagation::kNamedMetricsAll ||
       !propagation.named_metric_keys.empty()) {
     for (const auto& m : backend_metrics->named_metrics) {
-      if (propagation.propagation_bits & 
+      if (propagation.propagation_bits &
               BackendMetricPropagation::kNamedMetricsAll ||
           propagation.named_metric_keys.contains(m.first)) {
         stats.backend_metrics[absl::StrCat("named_metrics.", m.first)] +=

@@ -237,7 +237,6 @@ class XdsClusterImplLb final : public LoadBalancingPolicy {
       return backend_metric_propagation_;
     }
 
-
     const grpc_event_engine::experimental::Slice& hostname() const {
       return hostname_;
     }
@@ -846,8 +845,8 @@ RefCountedPtr<SubchannelInterface> XdsClusterImplLb::Helper::CreateSubchannel(
       parent()->channel_control_helper()->CreateSubchannel(
           address, per_address_args, args),
       std::move(locality_data),
-// FIXME: consider saving this in the XdsClusterLocalityStats object, so
-// that we don't need to store a pointer both per-subchannel and per-call?
+      // FIXME: consider saving this in the XdsClusterLocalityStats object, so
+      // that we don't need to store a pointer both per-subchannel and per-call?
       parent()->cluster_resource_->lrs_backend_metric_propagation,
       per_address_args.GetString(GRPC_ARG_ADDRESS_NAME).value_or(""));
 }
