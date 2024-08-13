@@ -174,7 +174,7 @@ class XdsClusterLocalityStats final
     uint64_t num_requests_finished_with_metric = 0;
     double total_metric_value = 0;
 
-    BackendMetric(BackendMetric&& other)
+    BackendMetric(BackendMetric&& other) noexcept
         : num_requests_finished_with_metric(
               std::exchange(other.num_requests_finished_with_metric, 0)),
           total_metric_value(std::exchange(other.total_metric_value, 0)) {}
@@ -252,8 +252,7 @@ class XdsClusterLocalityStats final
 
   void AddCallStarted();
   void AddCallFinished(const BackendMetricPropagation& propagation,
-                       const BackendMetricData* backend_metrics,
-                       bool fail = false);
+                       BackendMetricMetric* backend_metrics, bool fail = false);
 
   XdsLocalityName* locality_name() const { return name_.get(); }
 
