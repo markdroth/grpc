@@ -2477,9 +2477,9 @@ class TokenFetcherCredentialsTest : public ::testing::Test {
     event_engine_->FuzzingDone();
     event_engine_->TickUntilIdle();
     event_engine_->UnsetGlobalHooks();
-// FIXME
-//    grpc_event_engine::experimental::WaitForSingleOwner(
-//        std::move(event_engine_));
+    // FIXME
+    //    grpc_event_engine::experimental::WaitForSingleOwner(
+    //        std::move(event_engine_));
   }
 
   static RefCountedPtr<TokenFetcherCredentials::Token> MakeToken(
