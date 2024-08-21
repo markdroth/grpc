@@ -26,8 +26,8 @@
 
 namespace grpc_core {
 
-const JsonLoaderInterface*
-GcpAuthenticationParsedConfig::Config::JsonLoader(const JsonArgs&) {
+const JsonLoaderInterface* GcpAuthenticationParsedConfig::Config::JsonLoader(
+    const JsonArgs&) {
   static const auto* loader =
       JsonObjectLoader<Config>()
           .Field("filter_instance_name", &Config::filter_instance_name)
@@ -48,8 +48,7 @@ const JsonLoaderInterface* GcpAuthenticationParsedConfig::JsonLoader(
     const JsonArgs&) {
   static const auto* loader =
       JsonObjectLoader<GcpAuthenticationParsedConfig>()
-          .OptionalField("configs",
-                         &GcpAuthenticationParsedConfig::configs_)
+          .OptionalField("configs", &GcpAuthenticationParsedConfig::configs_)
           .Finish();
   return loader;
 }

@@ -30,14 +30,14 @@ namespace grpc_core {
 
 // A simple LRU cache.  Retains at most max_size entries.
 // Caller is responsible for synchronization.
-template<typename Key, typename Value>
+template <typename Key, typename Value>
 class LruCache {
  public:
   explicit LruCache(size_t max_size) : max_size_(max_size) {
     CHECK_GT(max_size, 0);
   }
 
-// FIXME: allow heterogenous lookups?
+  // FIXME: allow heterogenous lookups?
 
   // Returns the value for key, or nullopt if not present.
   absl::optional<Value> Get(Key key);
@@ -65,21 +65,20 @@ class LruCache {
 // implementation -- no user-serviceable parts below
 //
 
-template<typename Key, typename Value>
+template <typename Key, typename Value>
 absl::optional<Value> LruCache<Key, Value>::Get(Key key) {
   auto it = cache_.find(key);
   if (it == cache_.end()) return absl::nullopt;
   // Found the entry.  Move the entry to the end of the LRU list.
-  auto new_lru_it =
-      lru_list_.insert(lru_list_.end(), *it->second.lru_iterator);
+  auto new_lru_it = lru_list_.insert(lru_list_.end(), *it->second.lru_iterator);
   lru_list_.erase(it->second.lru_iterator);
   it->second.lru_iterator = new_lru_it;
   return it->second.value;
 }
 
-template<typename Key, typename Value>
-Value LruCache<Key, Value>::GetOrInsert(
-    Key key, absl::AnyInvocable<Value(Key)> create) {
+template <typename Key, typename Value>
+Value LruCache<Key, Value>::GetOrInsert(Key key,
+                                        absl::AnyInvocable<Value(Key)> create) {
   auto value = Get(key);
   if (value.has_value()) return std::move(*value);
   // Entry not found.  We'll need to insert a new entry.
@@ -93,9 +92,9 @@ Value LruCache<Key, Value>::GetOrInsert(
     lru_list_.pop_front();
   }
   // Create a new entry, insert it, and return it.
-  auto it = cache_.emplace(std::piecewise_construct,
-                           std::forward_as_tuple(key),
-                           std::forward_as_tuple(create(key)))
+  auto it = cache_
+                .emplace(std::piecewise_construct, std::forward_as_tuple(key),
+                         std::forward_as_tuple(create(key)))
                 .first;
   it->second.lru_iterator = lru_list_.insert(lru_list_.end(), key);
   return it->second.value;

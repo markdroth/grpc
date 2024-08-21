@@ -1654,8 +1654,7 @@ MATCHER_P(JsonEq, json_str, "") {
 
 MATCHER_P2(MetadataEntryEq, type, json_matcher, "") {
   bool ok = ::testing::ExplainMatchResult(type, arg.type, result_listener);
-  ok &= ::testing::ExplainMatchResult(json_matcher, arg.json,
-                                      result_listener);
+  ok &= ::testing::ExplainMatchResult(json_matcher, arg.json, result_listener);
   return ok;
 }
 
@@ -1684,18 +1683,19 @@ TEST_F(MetadataTest, MetadataSet) {
   ASSERT_TRUE(decode_result.resource.ok()) << decode_result.resource.status();
   auto& resource =
       static_cast<const XdsClusterResource&>(**decode_result.resource);
-  EXPECT_THAT(resource.metadata,
-              ::testing::ElementsAre(::testing::Pair(
-                  "filter_key", MetadataEntryEq(
-                      "google.protobuf.Struct",
-                      JsonEq("{"
-                             "\"bool_value\":true,"
-                             "\"list_value\":[\"efg\",3.14],"
-                             "\"null_value\":null,"
-                             "\"number_value\":3.14,"
-                             "\"string_value\":\"abc\","
-                             "\"struct_value\":{\"bool_value\":false}"
-                             "}")))));
+  EXPECT_THAT(
+      resource.metadata,
+      ::testing::ElementsAre(::testing::Pair(
+          "filter_key",
+          MetadataEntryEq("google.protobuf.Struct",
+                          JsonEq("{"
+                                 "\"bool_value\":true,"
+                                 "\"list_value\":[\"efg\",3.14],"
+                                 "\"null_value\":null,"
+                                 "\"number_value\":3.14,"
+                                 "\"string_value\":\"abc\","
+                                 "\"struct_value\":{\"bool_value\":false}"
+                                 "}")))));
 }
 
 TEST_F(MetadataTest, MetadataUnset) {

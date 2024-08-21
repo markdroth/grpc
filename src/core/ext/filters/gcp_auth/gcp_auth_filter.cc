@@ -68,9 +68,8 @@ struct Audience {
   std::string url;
 
   static const JsonLoaderInterface* JsonLoader(const JsonArgs& args) {
-    static const auto* loader = JsonObjectLoader<Audience>()
-        .Field("a", &Audience::url)
-        .Finish();
+    static const auto* loader =
+        JsonObjectLoader<Audience>().Field("a", &Audience::url).Finish();
     return loader;
   }
 };
@@ -79,8 +78,7 @@ struct Audience {
 
 absl::Status GcpAuthenticationFilter::Call::OnClientInitialMetadata(
     ClientMetadata& /*md*/, GcpAuthenticationFilter* filter) {
-
-// FIXME: this needs to move to channel init time
+  // FIXME: this needs to move to channel init time
   // Get filter config.
   auto* service_config_call_data = GetContext<ServiceConfigCallData>();
   CHECK_NE(service_config_call_data, nullptr);
@@ -113,9 +111,9 @@ absl::Status GcpAuthenticationFilter::Call::OnClientInitialMetadata(
   }
   auto audience = LoadFromJson<Audience>(md_it->second.json);
   if (!audience.ok()) {
-    return absl::UnavailableError(absl::StrCat(
-        "audience configuration invalid for cluster ", cluster_name, ": ",
-        audience.status().message()));
+    return absl::UnavailableError(
+        absl::StrCat("audience configuration invalid for cluster ",
+                     cluster_name, ": ", audience.status().message()));
   }
   // Get the call creds instance.
   auto creds = filter->GetCallCredentials(audience->url);
@@ -126,7 +124,7 @@ absl::Status GcpAuthenticationFilter::Call::OnClientInitialMetadata(
       arena->GetContext<SecurityContext>());
   if (security_ctx == nullptr) {
     ctx = arena->New<grpc_client_security_context>(std::move(creds));
-    arena->SetContext<grpc_core::SecurityContext>(ctx);
+    arena->SetContext<SecurityContext>(ctx);
   } else {
     ctx->creds = std::move(creds);
   }
@@ -155,11 +153,9 @@ GcpAuthenticationFilter::GcpAuthenticationFilter(
 RefCountedPtr<grpc_call_credentials>
 GcpAuthenticationFilter::GetCallCredentials(const std::string& audience) {
   MutexLock lock(&mu_);
-  cache_.GetOrInsert(
-      audience,
-      [](const std::string& audience) {
-        return MakeRefCounted<GcpServiceAccountIdentityCredentials>(audience);
-      });
+  cache_.GetOrInsert(audience, [](const std::string& audience) {
+    return MakeRefCounted<GcpServiceAccountIdentityCredentials>(audience);
+  });
 }
 
 void GcpAuthenticationFilterRegister(CoreConfiguration::Builder* builder) {

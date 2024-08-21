@@ -665,7 +665,7 @@ absl::StatusOr<std::shared_ptr<const XdsClusterResource>> CdsResourceParse(
       // TODO(roth): If we ever need to support another type here, refactor
       // this into a separate registry.
       if (extension->type == "extensions.filters.http.gcp_authn.v3.Audience") {
-// FIXME do this
+        // FIXME do this
         // TODO(roth): In a subsequent PR, add parsing here.
       }
     }
@@ -684,8 +684,8 @@ absl::StatusOr<std::shared_ptr<const XdsClusterResource>> CdsResourceParse(
             &errors, absl::StrCat(".metadata.filter_metadata[", key, "]"));
         errors.AddError(json.status().message());
       } else if (!cds_update->metadata.contains(key)) {
-        cds_update->metadata[key] =
-            {"google.protobuf.Struct", std::move(*json)};
+        cds_update->metadata[key] = {"google.protobuf.Struct",
+                                     std::move(*json)};
       }
     }
   }
