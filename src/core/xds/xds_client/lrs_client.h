@@ -73,13 +73,7 @@ class LrsClient : public DualRefCounted<LrsClient> {
         return *this;
       }
 
-      bool IsZero() const {
-        if (uncategorized_drops != 0) return false;
-        for (const auto& p : categorized_drops) {
-          if (p.second != 0) return false;
-        }
-        return true;
-      }
+      bool IsZero() const { return uncategorized_drops == 0; }
     };
 
     ClusterDropStats(RefCountedPtr<LrsClient> lrs_client,
@@ -146,14 +140,9 @@ class LrsClient : public DualRefCounted<LrsClient> {
       }
 
       bool IsZero() const {
-        if (total_successful_requests != 0 || total_requests_in_progress != 0 ||
-            total_error_requests != 0 || total_issued_requests != 0) {
-          return false;
-        }
-        for (const auto& p : backend_metrics) {
-          if (!p.second.IsZero()) return false;
-        }
-        return true;
+        return !(total_successful_requests != 0 ||
+                 total_requests_in_progress != 0 || total_error_requests != 0 ||
+                 total_issued_requests != 0);
       }
     };
 
