@@ -62,9 +62,8 @@ MATCHER_P4(EqXdsServer, name, creds_config_type, fail_on_data_errors,
   }
   bool ok = ::testing::ExplainMatchResult(name, server->server_uri(),
                                           result_listener);
-  ok |=
-      ::testing::ExplainMatchResult(server->FailOnDataErrors(),
-                                    fail_on_data_errors, result_listener);
+  ok |= ::testing::ExplainMatchResult(server->FailOnDataErrors(),
+                                      fail_on_data_errors, result_listener);
   ok |= ::testing::ExplainMatchResult(server->TrustedXdsServer(),
                                       trusted_xds_server, result_listener);
   auto creds_config = server->channel_creds_config();

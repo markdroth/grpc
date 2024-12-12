@@ -133,9 +133,7 @@ class XdsClientTest : public ::testing::Test {
           : server_uri_(server_uri),
             fail_on_data_errors_(fail_on_data_errors) {}
       const std::string& server_uri() const override { return server_uri_; }
-      bool FailOnDataErrors() const override {
-        return fail_on_data_errors_;
-      }
+      bool FailOnDataErrors() const override { return fail_on_data_errors_; }
       bool Equals(const XdsServer& other) const override {
         const auto& o = static_cast<const FakeXdsServer&>(other);
         return server_uri_ == o.server_uri_ &&

@@ -155,8 +155,8 @@ TEST_P(XdsEnabledServerTest, ListenerDeletionWithFailOnDataErrors) {
   balancer_->ads_service()->UnsetResource(
       kLdsTypeUrl, GetServerListenerName(backends_[0]->port()));
   // Server should stop serving.
-  ASSERT_TRUE(backends_[0]->WaitOnServingStatusChange(
-      grpc::StatusCode::NOT_FOUND));
+  ASSERT_TRUE(
+      backends_[0]->WaitOnServingStatusChange(grpc::StatusCode::NOT_FOUND));
 }
 
 // Testing just one example of an invalid resource here.
