@@ -334,9 +334,10 @@ class XdsClient::XdsChannel::AdsCall final
                      absl::string_view serialized_resource,
                      DecodeContext* context)
       ABSL_EXCLUSIVE_LOCKS_REQUIRED(&XdsClient::mu_);
-  void HandleServerReportedResourceError(
-      size_t idx, absl::string_view resource_name, absl::Status status,
-      DecodeContext* context)
+  void HandleServerReportedResourceError(size_t idx,
+                                         absl::string_view resource_name,
+                                         absl::Status status,
+                                         DecodeContext* context)
       ABSL_EXCLUSIVE_LOCKS_REQUIRED(&XdsClient::mu_);
   absl::Status DecodeAdsResponse(absl::string_view encoded_response,
                                  DecodeContext* context)
@@ -1481,9 +1482,10 @@ void XdsClient::ResourceState::SetAcked(
   failed_status_ = absl::OkStatus();
 }
 
-void XdsClient::ResourceState::SetNacked(
-    const std::string& version, absl::string_view details,
-    Timestamp update_time, bool drop_cached_resource) {
+void XdsClient::ResourceState::SetNacked(const std::string& version,
+                                         absl::string_view details,
+                                         Timestamp update_time,
+                                         bool drop_cached_resource) {
   if (drop_cached_resource) resource_.reset();
   client_status_ = ClientResourceStatus::NACKED;
   failed_version_ = version;
@@ -1501,9 +1503,10 @@ void XdsClient::ResourceState::SetTransientError(const std::string& details) {
   failed_status_ = absl::UnavailableError(details);
 }
 
-void XdsClient::ResourceState::SetReceivedError(
-    const std::string& version, absl::Status status, Timestamp update_time,
-    bool drop_cached_resource) {
+void XdsClient::ResourceState::SetReceivedError(const std::string& version,
+                                                absl::Status status,
+                                                Timestamp update_time,
+                                                bool drop_cached_resource) {
   if (drop_cached_resource) resource_.reset();
   client_status_ = status.code() == absl::StatusCode::kNotFound
                        ? ClientResourceStatus::DOES_NOT_EXIST
@@ -1575,9 +1578,9 @@ void XdsClient::ResourceState::FillGenericXdsConfig(
   if (client_status_ == ClientResourceStatus::NACKED ||
       client_status_ == ClientResourceStatus::RECEIVED_ERROR) {
     auto* update_failure_state = envoy_admin_v3_UpdateFailureState_new(arena);
-// FIXME: use ToString() here?  would require allocation, thus defeating
-// the mutex-exposing CSDS optimization.  maybe just remove that
-// optimization?
+    // FIXME: use ToString() here?  would require allocation, thus defeating
+    // the mutex-exposing CSDS optimization.  maybe just remove that
+    // optimization?
     envoy_admin_v3_UpdateFailureState_set_details(
         update_failure_state, StdStringToUpbString(failed_status_.message()));
     envoy_admin_v3_UpdateFailureState_set_version_info(

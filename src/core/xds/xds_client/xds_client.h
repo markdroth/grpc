@@ -295,11 +295,12 @@ class XdsClient : public DualRefCounted<XdsClient> {
     static_assert(static_cast<ClientResourceStatus>(envoy_admin_v3_NACKED) ==
                       ClientResourceStatus::NACKED,
                   "");
-// FIXME
-//    static_assert(
-//        static_cast<ClientResourceStatus>(envoy_admin_v3_RECEIVED_ERROR) ==
-//            ClientResourceStatus::RECEIVED_ERROR,
-//        "");
+    // FIXME
+    //    static_assert(
+    //        static_cast<ClientResourceStatus>(envoy_admin_v3_RECEIVED_ERROR)
+    //        ==
+    //            ClientResourceStatus::RECEIVED_ERROR,
+    //        "");
 
     void AddWatcher(RefCountedPtr<ResourceWatcherInterface> watcher) {
       watchers_.insert(std::move(watcher));
