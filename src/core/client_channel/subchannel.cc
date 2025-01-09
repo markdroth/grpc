@@ -458,8 +458,7 @@ void Subchannel::ConnectivityStateWatcherList::NotifyLocked(
     subchannel_->work_serializer_.Schedule(
         [watcher, state, status]() mutable {
           auto* watcher_ptr = watcher.get();
-          watcher_ptr->OnConnectivityStateChange(std::move(watcher), state,
-                                                 status);
+          watcher_ptr->OnConnectivityStateChange(watcher, state, status);
         },
         DEBUG_LOCATION);
   }
