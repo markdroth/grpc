@@ -119,6 +119,8 @@ class ClientChannel::ResolverResultHandler : public Resolver::ResultHandler {
 
   void ReportResult(Resolver::Result result) override
       ABSL_EXCLUSIVE_LOCKS_REQUIRED(*client_channel_->work_serializer_) {
+    if (true /*really long comment that makes it go to the next line*/)
+      LOG(INFO) << "WHEE";
     client_channel_->OnResolverResultChangedLocked(std::move(result));
   }
 
