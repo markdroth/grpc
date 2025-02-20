@@ -5556,7 +5556,6 @@ endif()
 
 
 add_library(grpc_authorization_provider
-  src/core/call/delay_tracker.cc
   src/core/channelz/channel_trace.cc
   src/core/channelz/channelz.cc
   src/core/channelz/channelz_registry.cc
@@ -9291,7 +9290,6 @@ endif()
 if(gRPC_BUILD_TESTS)
 
 add_executable(call_filters_test
-  src/core/call/delay_tracker.cc
   src/core/ext/upb-gen/google/protobuf/any.upb_minitable.c
   src/core/ext/upb-gen/google/rpc/status.upb_minitable.c
   src/core/lib/channel/channel_args.cc
@@ -9617,7 +9615,6 @@ endif()
 if(gRPC_BUILD_TESTS)
 
 add_executable(call_utils_test
-  src/core/call/delay_tracker.cc
   src/core/channelz/channel_trace.cc
   src/core/channelz/channelz.cc
   src/core/channelz/channelz_registry.cc
@@ -26670,7 +26667,6 @@ endif()
 if(gRPC_BUILD_TESTS)
 
 add_executable(request_buffer_test
-  src/core/call/delay_tracker.cc
   src/core/call/request_buffer.cc
   src/core/ext/upb-gen/google/protobuf/any.upb_minitable.c
   src/core/ext/upb-gen/google/rpc/status.upb_minitable.c

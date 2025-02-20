@@ -22,8 +22,8 @@
 #include <memory>
 #include <optional>
 
-#include "gtest/gtest.h"
 #include "gmock/gmock.h"
+#include "gtest/gtest.h"
 #include "src/core/lib/channel/channel_args.h"
 #include "src/core/util/time.h"
 #include "test/core/end2end/end2end_tests.h"
@@ -92,11 +92,10 @@ void TestRetryCancellation(CoreEnd2endTest& test,
   test.Step();
   EXPECT_EQ(server_status.status(), mode->ExpectedStatus());
   if (server_status.status() == GRPC_STATUS_DEADLINE_EXCEEDED) {
-    EXPECT_THAT(
-        server_status.message(),
-        ::testing::MatchesRegex(
-            "Deadline Exceeded \\(Name resolver delay [0-9]+ms; "
-            "retry attempt 0:\\[Load balancing delay [0-9]+ms\\]\\)"));
+    EXPECT_THAT(server_status.message(),
+                ::testing::MatchesRegex(
+                    "Deadline Exceeded \\(Name resolver delay [0-9]+ms; "
+                    "retry attempt 0:\\[Load balancing delay [0-9]+ms\\]\\)"));
   }
   EXPECT_FALSE(client_close.was_cancelled());
 }

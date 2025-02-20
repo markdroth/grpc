@@ -444,9 +444,9 @@ void FilterStackCall::RecvInitialFilter(grpc_metadata_batch* b) {
   PublishAppMetadata(b, false);
 }
 
-void FilterStackCall::RecvTrailingFilter(
-    grpc_metadata_batch* b, grpc_error_handle batch_error,
-    grpc_core::DelayTracker* delay_tracker) {
+void FilterStackCall::RecvTrailingFilter(grpc_metadata_batch* b,
+                                         grpc_error_handle batch_error,
+                                         DelayTracker* delay_tracker) {
   if (!batch_error.ok()) {
     SetFinalStatus(batch_error);
   } else {
@@ -713,8 +713,8 @@ void FilterStackCall::BatchControl::ReceivingTrailingMetadataReady(
     grpc_error_handle error) {
   // Before leaving the call combiner, grab the delay tracker from call
   // context.
-  DelayTracker* delay_tracker = call_->arena()->GetContext<DelayTracker>();
-  call_->arena()->SetContext<DelayTracker>(nullptr);
+  DelayTracker* delay_tracker = call_->arena()->GetContext<delay_tracker>();
+  call_->arena()->SetContext<delay_tracker>(nullptr);
   GRPC_CALL_COMBINER_STOP(call_->call_combiner(),
                           "recv_trailing_metadata_ready");
   grpc_metadata_batch* md = &call_->recv_trailing_metadata_;
