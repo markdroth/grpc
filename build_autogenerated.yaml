@@ -6430,7 +6430,6 @@ targets:
   build: test
   language: c++
   headers:
-  - src/core/call/delay_tracker.h
   - src/core/ext/upb-gen/google/protobuf/any.upb.h
   - src/core/ext/upb-gen/google/protobuf/any.upb_minitable.h
   - src/core/ext/upb-gen/google/rpc/status.upb.h
@@ -6521,7 +6520,6 @@ targets:
   - test/core/promise/poll_matcher.h
   - third_party/upb/upb/generated_code_support.h
   src:
-  - src/core/call/delay_tracker.cc
   - src/core/ext/upb-gen/google/protobuf/any.upb_minitable.c
   - src/core/ext/upb-gen/google/rpc/status.upb_minitable.c
   - src/core/lib/channel/channel_args.cc
@@ -17147,7 +17145,6 @@ targets:
   build: test
   language: c++
   headers:
-  - src/core/call/delay_tracker.h
   - src/core/call/request_buffer.h
   - src/core/ext/upb-gen/google/protobuf/any.upb.h
   - src/core/ext/upb-gen/google/protobuf/any.upb_minitable.h
@@ -17248,7 +17245,6 @@ targets:
   - test/core/promise/poll_matcher.h
   - third_party/upb/upb/generated_code_support.h
   src:
-  - src/core/call/delay_tracker.cc
   - src/core/call/request_buffer.cc
   - src/core/ext/upb-gen/google/protobuf/any.upb_minitable.c
   - src/core/ext/upb-gen/google/rpc/status.upb_minitable.c

@@ -444,9 +444,9 @@ void FilterStackCall::RecvInitialFilter(grpc_metadata_batch* b) {
   PublishAppMetadata(b, false);
 }
 
-void FilterStackCall::RecvTrailingFilter(
-    grpc_metadata_batch* b, grpc_error_handle batch_error,
-    grpc_core::DelayTracker* delay_tracker) {
+void FilterStackCall::RecvTrailingFilter(grpc_metadata_batch* b,
+                                         grpc_error_handle batch_error,
+                                         DelayTracker* delay_tracker) {
   if (!batch_error.ok()) {
     SetFinalStatus(batch_error);
   } else {
