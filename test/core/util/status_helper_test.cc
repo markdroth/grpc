@@ -54,14 +54,14 @@ TEST(StatusUtilTest, GetIntNotExistent) {
 
 TEST(StatusUtilTest, SetAndGetStr) {
   absl::Status s = absl::CancelledError();
-  StatusSetStr(&s, StatusStrProperty::kDescription, "value");
-  EXPECT_EQ("value", StatusGetStr(s, StatusStrProperty::kDescription));
+  StatusSetStr(&s, StatusIntProperty::kDescription, "value");
+  EXPECT_EQ("value", StatusGetStr(s, StatusIntProperty::kDescription));
 }
 
 TEST(StatusUtilTest, GetStrNotExistent) {
   absl::Status s = absl::CancelledError();
   EXPECT_EQ(std::optional<std::string>(),
-            StatusGetStr(s, StatusStrProperty::kDescription));
+            StatusGetStr(s, StatusIntProperty::kDescription));
 }
 
 TEST(StatusUtilTest, AddAndGetChildren) {
@@ -121,7 +121,7 @@ TEST(StatusUtilTest, ErrorWithIntPropertyToString) {
 
 TEST(StatusUtilTest, ErrorWithStrPropertyToString) {
   absl::Status s = absl::CancelledError("Message");
-  StatusSetStr(&s, StatusStrProperty::kFile, "foo.cc");
+  StatusSetStr(&s, StatusIntProperty::kFile, "foo.cc");
   std::string t = StatusToString(s);
   EXPECT_EQ("CANCELLED:Message {file:\"foo.cc\"}", t);
 }
@@ -132,7 +132,7 @@ TEST(StatusUtilTest, ComplexErrorWithChildrenToString) {
   absl::Status s1 = absl::AbortedError("Message1");
   StatusAddChild(&s, s1);
   absl::Status s2 = absl::AlreadyExistsError("Message2");
-  StatusSetStr(&s2, StatusStrProperty::kDescription, "value");
+  StatusSetStr(&s2, StatusIntProperty::kDescription, "value");
   StatusAddChild(&s, s2);
   std::string t = StatusToString(s);
   EXPECT_EQ(
