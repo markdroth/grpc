@@ -234,9 +234,8 @@ void StatusAddChild(absl::Status* status, absl::Status child) {
     // Parent and child are both non-OK, so we need to merge.
     absl::Status new_status(
         // Prefer any other code over UNKNOWN.
-        status->code() == absl::StatusCode::kUnknown
-            ? child.code()
-            : status->code(),
+        status->code() == absl::StatusCode::kUnknown ? child.code()
+                                                     : status->code(),
         absl::StrCat(status->message(), " (", child.message(), ")"));
     // TODO(roth): Remove this once we eliminate all status attributes.
     status->ForEachPayload(
