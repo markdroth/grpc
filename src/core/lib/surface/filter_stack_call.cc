@@ -455,8 +455,8 @@ void FilterStackCall::RecvTrailingFilter(grpc_metadata_batch* b,
       absl::string_view message;
       if (grpc_message.has_value()) message = grpc_message->as_string_view();
       grpc_error_handle error = grpc_error_set_int(
-          GRPC_ERROR_CREATE(message),
-          StatusIntProperty::kRpcStatus, static_cast<intptr_t>(*grpc_status));
+          GRPC_ERROR_CREATE(message), StatusIntProperty::kRpcStatus,
+          static_cast<intptr_t>(*grpc_status));
       SetFinalStatus(error);
     } else if (!is_client()) {
       SetFinalStatus(absl::OkStatus());
