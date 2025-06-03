@@ -321,7 +321,7 @@ void AdsServiceImpl::Reactor::OnWriteDone(bool ok) {
 void AdsServiceImpl::Reactor::MaybeStartNextWrite() {
   auto it = response_needed_.begin();
   if (it == response_needed_.end()) return;
-  auto resource_type = std::move(*it);
+  auto resource_type = *it;
   response_needed_.erase(it);
   MaybeStartWrite(resource_type);
 }
