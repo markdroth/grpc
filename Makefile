@@ -1553,6 +1553,7 @@ LIBGRPC_SRC = \
     src/core/xds/grpc/xds_cluster_specifier_plugin.cc \
     src/core/xds/grpc/xds_common_types.cc \
     src/core/xds/grpc/xds_common_types_parser.cc \
+    src/core/xds/grpc/xds_ecds.cc \
     src/core/xds/grpc/xds_endpoint.cc \
     src/core/xds/grpc/xds_endpoint_parser.cc \
     src/core/xds/grpc/xds_health_status.cc \

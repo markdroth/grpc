@@ -2120,6 +2120,8 @@
     <file baseinstalldir="/" name="src/core/xds/grpc/xds_common_types.h" role="src" />
     <file baseinstalldir="/" name="src/core/xds/grpc/xds_common_types_parser.cc" role="src" />
     <file baseinstalldir="/" name="src/core/xds/grpc/xds_common_types_parser.h" role="src" />
+    <file baseinstalldir="/" name="src/core/xds/grpc/xds_ecds.cc" role="src" />
+    <file baseinstalldir="/" name="src/core/xds/grpc/xds_ecds.h" role="src" />
     <file baseinstalldir="/" name="src/core/xds/grpc/xds_endpoint.cc" role="src" />
     <file baseinstalldir="/" name="src/core/xds/grpc/xds_endpoint.h" role="src" />
     <file baseinstalldir="/" name="src/core/xds/grpc/xds_endpoint_parser.cc" role="src" />
