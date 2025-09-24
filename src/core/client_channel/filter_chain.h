@@ -58,7 +58,7 @@ class FilterChainBuilderV1 {
 // favor of just directly using UnstartedCallDestination.
 class FilterChain : public RefCounted<FilterChain> {
  public:
-  virtual ~FilterChain() = default;
+  ~FilterChain() override = default;
 };
 
 // Abstract filter chain builder interface.

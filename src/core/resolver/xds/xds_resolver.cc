@@ -672,7 +672,7 @@ std::optional<uint64_t> HeaderHashHelper(
 void XdsResolver::XdsConfigSelector::BuildFilterChains(
     FilterChainBuilder& builder, const Blackboard* old_blackboard,
     Blackboard* new_blackboard) {
-// FIXME: implement
+  // FIXME: implement
 }
 
 absl::StatusOr<RefCountedPtr<FilterChain>>
