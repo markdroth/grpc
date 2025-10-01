@@ -67,7 +67,7 @@ class ConfigSelector : public RefCounted<ConfigSelector> {
                                  const Blackboard* old_blackboard,
                                  Blackboard* new_blackboard) = 0;
 
-// FIXME: remove
+  // FIXME: remove
   // The channel will call this when the resolver returns a new ConfigSelector
   // to determine what set of dynamic filters will be configured.
   virtual void AddFilters(InterceptionChainBuilder& /*builder*/,

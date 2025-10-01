@@ -199,8 +199,9 @@ XdsHttpFaultFilter::GenerateFilterConfig(
     fault_injection_policy_json["maxFaults"] =
         Json::FromNumber(*max_fault_wrapper);
   }
-  return XdsFilterConfig{ConfigProtoName(),
-                         Json::FromObject(std::move(fault_injection_policy_json))};
+  return XdsFilterConfig{
+      ConfigProtoName(),
+      Json::FromObject(std::move(fault_injection_policy_json))};
 }
 
 std::optional<XdsHttpFilterImpl::XdsFilterConfig>
@@ -250,8 +251,7 @@ XdsHttpFaultFilter::GenerateServiceConfig(
   return ServiceConfigJsonEntry{"", ""};
 }
 
-RefCountedPtr<const FilterConfig>
-XdsHttpFaultFilter::ParseTopLevelConfig(
+RefCountedPtr<const FilterConfig> XdsHttpFaultFilter::ParseTopLevelConfig(
     absl::string_view /*instance_name*/,
     const XdsResourceType::DecodeContext& context, XdsExtension extension,
     ValidationErrors* errors) const {
@@ -349,8 +349,7 @@ XdsHttpFaultFilter::ParseTopLevelConfig(
   return config;
 }
 
-RefCountedPtr<const FilterConfig>
-XdsHttpFaultFilter::ParseOverrideConfig(
+RefCountedPtr<const FilterConfig> XdsHttpFaultFilter::ParseOverrideConfig(
     absl::string_view instance_name,
     const XdsResourceType::DecodeContext& context, XdsExtension extension,
     ValidationErrors* errors) const {
@@ -362,8 +361,7 @@ RefCountedPtr<const FilterConfig> XdsHttpFaultFilter::MergeConfigs(
     RefCountedPtr<const FilterConfig> top_level_config,
     RefCountedPtr<const FilterConfig> virtual_host_override_config,
     RefCountedPtr<const FilterConfig> route_override_config,
-    RefCountedPtr<const FilterConfig>
-        cluster_weight_override_config) const {
+    RefCountedPtr<const FilterConfig> cluster_weight_override_config) const {
   // No merging, just return the most specific config that exists.
   if (cluster_weight_override_config != nullptr) {
     return cluster_weight_override_config;
