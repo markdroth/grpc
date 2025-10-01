@@ -220,7 +220,7 @@ void XdsHttpFaultFilter::AddFilter(InterceptionChainBuilder& builder) const {
 
 void XdsHttpFaultFilter::AddFilter(
     FilterChainBuilder& builder,
-    RefCountedPtr<const grpc_core::FilterConfig> config) const {
+    RefCountedPtr<const FilterConfig> config) const {
   builder.AddFilter<FaultInjectionFilter>(std::move(config));
 }
 
@@ -250,8 +250,7 @@ XdsHttpFaultFilter::GenerateServiceConfig(
   return ServiceConfigJsonEntry{"", ""};
 }
 
-RefCountedPtr<const grpc_core::FilterConfig>
-XdsHttpFaultFilter::ParseTopLevelConfig(
+RefCountedPtr<const FilterConfig> XdsHttpFaultFilter::ParseTopLevelConfig(
     absl::string_view /*instance_name*/,
     const XdsResourceType::DecodeContext& context, XdsExtension extension,
     ValidationErrors* errors) const {
@@ -349,8 +348,7 @@ XdsHttpFaultFilter::ParseTopLevelConfig(
   return config;
 }
 
-RefCountedPtr<const grpc_core::FilterConfig>
-XdsHttpFaultFilter::ParseOverrideConfig(
+RefCountedPtr<const FilterConfig> XdsHttpFaultFilter::ParseOverrideConfig(
     absl::string_view instance_name,
     const XdsResourceType::DecodeContext& context, XdsExtension extension,
     ValidationErrors* errors) const {
@@ -358,12 +356,11 @@ XdsHttpFaultFilter::ParseOverrideConfig(
                              errors);
 }
 
-RefCountedPtr<const grpc_core::FilterConfig> XdsHttpFaultFilter::MergeConfigs(
-    RefCountedPtr<const grpc_core::FilterConfig> top_level_config,
-    RefCountedPtr<const grpc_core::FilterConfig> virtual_host_override_config,
-    RefCountedPtr<const grpc_core::FilterConfig> route_override_config,
-    RefCountedPtr<const grpc_core::FilterConfig>
-        cluster_weight_override_config) const {
+RefCountedPtr<const FilterConfig> XdsHttpFaultFilter::MergeConfigs(
+    RefCountedPtr<const FilterConfig> top_level_config,
+    RefCountedPtr<const FilterConfig> virtual_host_override_config,
+    RefCountedPtr<const FilterConfig> route_override_config,
+    RefCountedPtr<const FilterConfig> cluster_weight_override_config) const {
   // No merging, just return the most specific config that exists.
   if (cluster_weight_override_config != nullptr) {
     return cluster_weight_override_config;

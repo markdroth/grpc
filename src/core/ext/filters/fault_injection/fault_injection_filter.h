@@ -96,7 +96,7 @@ class FaultInjectionFilter
   InjectionDecision MakeInjectionDecision(
       const ClientMetadata& initial_metadata);
 
-// FIXME: remove
+  // FIXME: remove
   // The relative index of instances of the same filter.
   size_t index_;
   const size_t service_config_parser_index_;
