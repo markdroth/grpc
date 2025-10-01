@@ -53,24 +53,23 @@ class XdsHttpGcpAuthnFilter final : public XdsHttpFilterImpl {
   absl::StatusOr<ServiceConfigJsonEntry> GenerateServiceConfig(
       const FilterConfig& hcm_filter_config) const override;
   void AddFilter(FilterChainBuilder& builder,
-                 RefCountedPtr<const grpc_core::FilterConfig> config) const override;
-  RefCountedPtr<const grpc_core::FilterConfig> ParseTopLevelConfig(
-        absl::string_view instance_name,
-        const XdsResourceType::DecodeContext& context, XdsExtension extension,
-        ValidationErrors* errors) const override;
-  RefCountedPtr<const grpc_core::FilterConfig> ParseOverrideConfig(
-        absl::string_view instance_name,
-        const XdsResourceType::DecodeContext& context, XdsExtension extension,
-        ValidationErrors* errors) const override;
-  RefCountedPtr<const grpc_core::FilterConfig> MergeConfigs(
-      RefCountedPtr<const grpc_core::FilterConfig> top_level_config,
-      RefCountedPtr<const grpc_core::FilterConfig>
-          virtual_host_override_config,
-      RefCountedPtr<const grpc_core::FilterConfig> route_override_config,
-      RefCountedPtr<const grpc_core::FilterConfig>
-          cluster_weight_override_config) const override;
+                 RefCountedPtr<const FilterConfig> config) const override;
+  RefCountedPtr<const FilterConfig> ParseTopLevelConfig(
+      absl::string_view instance_name,
+      const XdsResourceType::DecodeContext& context, XdsExtension extension,
+      ValidationErrors* errors) const override;
+  RefCountedPtr<const FilterConfig> ParseOverrideConfig(
+      absl::string_view instance_name,
+      const XdsResourceType::DecodeContext& context, XdsExtension extension,
+      ValidationErrors* errors) const override;
+  RefCountedPtr<const FilterConfig> MergeConfigs(
+      RefCountedPtr<const FilterConfig> top_level_config,
+      RefCountedPtr<const FilterConfig> virtual_host_override_config,
+      RefCountedPtr<const FilterConfig> route_override_config,
+      RefCountedPtr<const FilterConfig> cluster_weight_override_config)
+      const override;
   void UpdateBlackboard(const FilterConfig& hcm_filter_config,
-                        const grpc_core::FilterConfig* config,
+                        const FilterConfig* config,
                         const Blackboard* old_blackboard,
                         Blackboard* new_blackboard) const override;
   bool IsSupportedOnClients() const override { return true; }

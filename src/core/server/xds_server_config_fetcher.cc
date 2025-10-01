@@ -1125,8 +1125,7 @@ void XdsServerConfigFetcher::ListenerWatcher::FilterChainMatchManager::
                         nullptr);  // Enforced in config validation.
           filter_impl->UpdateBlackboard(http_filter.config,
                                         nullptr,  // FIXME
-                                        old_blackboard,
-                                        new_blackboard);
+                                        old_blackboard, new_blackboard);
         }
       });
 }

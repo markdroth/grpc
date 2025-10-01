@@ -82,7 +82,7 @@ class XdsHttpFilterImpl {
   // Loads the proto message into the upb symtab.
   virtual void PopulateSymtab(upb_DefPool* symtab) const = 0;
 
-// FIXME: remove
+  // FIXME: remove
   // Generates a Config from the xDS filter config proto.
   // Used for the top-level config in the HCM HTTP filter list.
   virtual std::optional<FilterConfig> GenerateFilterConfig(
@@ -90,7 +90,7 @@ class XdsHttpFilterImpl {
       const XdsResourceType::DecodeContext& context, XdsExtension extension,
       ValidationErrors* errors) const = 0;
 
-// FIXME: remove
+  // FIXME: remove
   // Generates a Config from the xDS filter config proto.
   // Used for the typed_per_filter_config override in VirtualHost and Route.
   virtual std::optional<FilterConfig> GenerateFilterConfigOverride(
@@ -98,20 +98,20 @@ class XdsHttpFilterImpl {
       const XdsResourceType::DecodeContext& context, XdsExtension extension,
       ValidationErrors* errors) const = 0;
 
-// FIXME: remove
+  // FIXME: remove
   // C-core channel filter implementation.
   virtual void AddFilter(InterceptionChainBuilder& builder) const = 0;
   // TODO(roth): Remove this once the legacy filter stack goes away.
   virtual const grpc_channel_filter* channel_filter() const = 0;
 
-// FIXME: remove
+  // FIXME: remove
   // Modifies channel args that may affect service config parsing (not
   // visible to the channel as a whole).
   virtual ChannelArgs ModifyChannelArgs(const ChannelArgs& args) const {
     return args;
   }
 
-// FIXME: remove
+  // FIXME: remove
   // Function to convert the Configs into a JSON string to be added to the
   // per-method part of the service config.
   // The hcm_filter_config comes from the HttpConnectionManager config.
@@ -122,7 +122,7 @@ class XdsHttpFilterImpl {
       const FilterConfig& hcm_filter_config,
       const FilterConfig* filter_config_override) const = 0;
 
-// FIXME: remove
+  // FIXME: remove
   // Function to convert the Configs into a JSON string to be added to the
   // top level of the service config.
   // The hcm_filter_config comes from the HttpConnectionManager config.
@@ -132,37 +132,35 @@ class XdsHttpFilterImpl {
 
   // Adds the filter to the builder.
   virtual void AddFilter(FilterChainBuilder& builder,
-                         RefCountedPtr<const grpc_core::FilterConfig> config) const = 0;
+                         RefCountedPtr<const FilterConfig> config) const = 0;
 
   // Parses the top-level filter config.
-  virtual RefCountedPtr<const grpc_core::FilterConfig> ParseTopLevelConfig(
+  virtual RefCountedPtr<const FilterConfig> ParseTopLevelConfig(
       absl::string_view instance_name,
       const XdsResourceType::DecodeContext& context, XdsExtension extension,
       ValidationErrors* errors) const = 0;
 
   // Parses an override config.
-  virtual RefCountedPtr<const grpc_core::FilterConfig> ParseOverrideConfig(
+  virtual RefCountedPtr<const FilterConfig> ParseOverrideConfig(
       absl::string_view instance_name,
       const XdsResourceType::DecodeContext& context, XdsExtension extension,
       ValidationErrors* errors) const = 0;
 
   // Returns a new filter config that takes into account any necessary
   // overrides.
-  virtual RefCountedPtr<const grpc_core::FilterConfig> MergeConfigs(
-      RefCountedPtr<const grpc_core::FilterConfig> top_level_config,
-      RefCountedPtr<const grpc_core::FilterConfig>
-          virtual_host_override_config,
-      RefCountedPtr<const grpc_core::FilterConfig> route_override_config,
-      RefCountedPtr<const grpc_core::FilterConfig>
-          cluster_weight_override_config) const = 0;
+  virtual RefCountedPtr<const FilterConfig> MergeConfigs(
+      RefCountedPtr<const FilterConfig> top_level_config,
+      RefCountedPtr<const FilterConfig> virtual_host_override_config,
+      RefCountedPtr<const FilterConfig> route_override_config,
+      RefCountedPtr<const FilterConfig> cluster_weight_override_config)
+      const = 0;
 
   // Adds state to new_blackboard if needed for the specified filter
   // config.  Copies existing state from old_blackboard as appropriate.
   virtual void UpdateBlackboard(
       const FilterConfig& /*hcm_filter_config*/,  // FIXME: remove
-                                const grpc_core::FilterConfig* /*config*/,
-                                const Blackboard* /*old_blackboard*/,
-                                Blackboard* /*new_blackboard*/) const {}
+      const FilterConfig* /*config*/, const Blackboard* /*old_blackboard*/,
+      Blackboard* /*new_blackboard*/) const {}
 
   // Returns true if the filter is supported on clients; false otherwise
   virtual bool IsSupportedOnClients() const = 0;

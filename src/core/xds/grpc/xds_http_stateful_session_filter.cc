@@ -203,7 +203,7 @@ void XdsHttpStatefulSessionFilter::AddFilter(
 
 void XdsHttpStatefulSessionFilter::AddFilter(
     FilterChainBuilder& builder,
-    RefCountedPtr<const grpc_core::FilterConfig> config) const {
+    RefCountedPtr<const FilterConfig> config) const {
   builder.AddFilter<StatefulSessionFilter>(std::move(config));
 }
 
@@ -300,11 +300,11 @@ StatefulSessionFilter::CookieConfig ParseCookieConfig(
 
 }  // namespace
 
-RefCountedPtr<const grpc_core::FilterConfig>
+RefCountedPtr<const FilterConfig>
 XdsHttpStatefulSessionFilter::ParseTopLevelConfig(
-      absl::string_view instance_name,
-      const XdsResourceType::DecodeContext& context, XdsExtension extension,
-      ValidationErrors* errors) const {
+    absl::string_view instance_name,
+    const XdsResourceType::DecodeContext& context, XdsExtension extension,
+    ValidationErrors* errors) const {
   absl::string_view* serialized_filter_config =
       std::get_if<absl::string_view>(&extension.value);
   if (serialized_filter_config == nullptr) {
@@ -324,11 +324,11 @@ XdsHttpStatefulSessionFilter::ParseTopLevelConfig(
   return config;
 }
 
-RefCountedPtr<const grpc_core::FilterConfig>
+RefCountedPtr<const FilterConfig>
 XdsHttpStatefulSessionFilter::ParseOverrideConfig(
-      absl::string_view instance_name,
-      const XdsResourceType::DecodeContext& context, XdsExtension extension,
-      ValidationErrors* errors) const {
+    absl::string_view instance_name,
+    const XdsResourceType::DecodeContext& context, XdsExtension extension,
+    ValidationErrors* errors) const {
   absl::string_view* serialized_filter_config =
       std::get_if<absl::string_view>(&extension.value);
   if (serialized_filter_config == nullptr) {
@@ -360,9 +360,8 @@ XdsHttpStatefulSessionFilter::ParseOverrideConfig(
 
 namespace {
 
-RefCountedPtr<const grpc_core::FilterConfig>
-ConvertOverrideConfigToTopLevelConfig(
-    const grpc_core::FilterConfig& override_config) {
+RefCountedPtr<const FilterConfig> ConvertOverrideConfigToTopLevelConfig(
+    const FilterConfig& override_config) {
   const auto& oc =
       DownCast<const StatefulSessionFilter::OverrideConfig&>(override_config);
   auto config = MakeRefCounted<StatefulSessionFilter::Config>();
@@ -372,14 +371,11 @@ ConvertOverrideConfigToTopLevelConfig(
 
 }  // namespace
 
-RefCountedPtr<const grpc_core::FilterConfig>
-XdsHttpStatefulSessionFilter::MergeConfigs(
-    RefCountedPtr<const grpc_core::FilterConfig> top_level_config,
-    RefCountedPtr<const grpc_core::FilterConfig>
-        virtual_host_override_config,
-    RefCountedPtr<const grpc_core::FilterConfig> route_override_config,
-    RefCountedPtr<const grpc_core::FilterConfig>
-        cluster_weight_override_config) const {
+RefCountedPtr<const FilterConfig> XdsHttpStatefulSessionFilter::MergeConfigs(
+    RefCountedPtr<const FilterConfig> top_level_config,
+    RefCountedPtr<const FilterConfig> virtual_host_override_config,
+    RefCountedPtr<const FilterConfig> route_override_config,
+    RefCountedPtr<const FilterConfig> cluster_weight_override_config) const {
   // No merging here, we just use the most specific config.  However,
   // because the override configs are a different protobuf message type,
   // we need to convert them to the top-level config type, which is what

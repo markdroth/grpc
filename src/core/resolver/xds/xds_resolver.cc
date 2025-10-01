@@ -214,7 +214,7 @@ class XdsResolver final : public Resolver {
                weighted_cluster_state == other.weighted_cluster_state &&
                MethodConfigsEqual(method_config.get(),
                                   other.method_config.get());
-               FilterChainsEqual(filter_chain, other.filter_chain);
+        FilterChainsEqual(filter_chain, other.filter_chain);
       }
     };
 
@@ -236,11 +236,11 @@ class XdsResolver final : public Resolver {
     RouteEntry* GetRouteForRequest(absl::string_view path,
                                    grpc_metadata_batch* initial_metadata);
 
-    void BuildFilterChains(
-        const XdsConfig& xds_config, 
-        const std::vector<const XdsHttpFilterImpl*>& filters,
-        FilterChainBuilder& builder, const Blackboard* old_blackboard,
-        Blackboard* new_blackboard);
+    void BuildFilterChains(const XdsConfig& xds_config,
+                           const std::vector<const XdsHttpFilterImpl*>& filters,
+                           FilterChainBuilder& builder,
+                           const Blackboard* old_blackboard,
+                           Blackboard* new_blackboard);
 
    private:
     class RouteListIterator;
@@ -265,7 +265,7 @@ class XdsResolver final : public Resolver {
       if (*fc1 == nullptr) return *fc2 == nullptr;
       if (*fc2 == nullptr) return false;
       // FIXME:
-      //return **fc1 == **fc2;
+      // return **fc1 == **fc2;
       return true;
     }
 
@@ -472,7 +472,7 @@ RefCountedPtr<const FilterConfig> GetOverrideConfig(
 }
 
 void XdsResolver::RouteConfigData::BuildFilterChains(
-    const XdsConfig& xds_config, 
+    const XdsConfig& xds_config,
     const std::vector<const XdsHttpFilterImpl*>& filters,
     FilterChainBuilder& builder, const Blackboard* old_blackboard,
     Blackboard* new_blackboard) {
@@ -487,12 +487,12 @@ void XdsResolver::RouteConfigData::BuildFilterChains(
       for (size_t i = 0; i < filters.size(); ++i) {
         auto* filter = filters[i];
         const auto& filter_config = hcm.http_filters[i];
-        auto vhost_override_config = GetOverrideConfig(
-            xds_config.virtual_host->typed_per_filter_config,
-            filter_config.name);
-        auto config = filter->MergeConfigs(
-            filter_config.filter_config, std::move(vhost_override_config),
-            nullptr, nullptr);
+        auto vhost_override_config =
+            GetOverrideConfig(xds_config.virtual_host->typed_per_filter_config,
+                              filter_config.name);
+        auto config = filter->MergeConfigs(filter_config.filter_config,
+                                           std::move(vhost_override_config),
+                                           nullptr, nullptr);
         filter->AddFilter(builder, config);
         filter->UpdateBlackboard({}, config.get(), old_blackboard,
                                  new_blackboard);
@@ -538,10 +538,9 @@ void XdsResolver::RouteConfigData::BuildFilterChains(
     };
     // If the route uses WeightedClusters, construct a filter chain for
     // each ClusterWeight entry.
-    if (const auto* weighted_clusters =
-            std::get_if<std::vector<
-                XdsRouteConfigResource::Route::RouteAction::ClusterWeight>>(
-                &route_action->action);
+    if (const auto* weighted_clusters = std::get_if<std::vector<
+            XdsRouteConfigResource::Route::RouteAction::ClusterWeight>>(
+            &route_action->action);
         weighted_clusters != nullptr) {
       GRPC_CHECK_EQ(weighted_clusters->size(),
                     route_entry.weighted_cluster_state.size());
@@ -562,8 +561,8 @@ void XdsResolver::RouteConfigData::BuildFilterChains(
                 filter_config.name);
             auto route_override_config = GetOverrideConfig(
                 route_entry.route.typed_per_filter_config, filter_config.name);
-            auto cluster_weight_override_config = GetOverrideConfig(
-                typed_per_filter_config, filter_config.name);
+            auto cluster_weight_override_config =
+                GetOverrideConfig(typed_per_filter_config, filter_config.name);
             auto config = filter->MergeConfigs(
                 filter_config.filter_config, std::move(vhost_override_config),
                 std::move(route_override_config),
@@ -966,8 +965,8 @@ XdsResolver::XdsConfigSelector::GetFilters(const Blackboard* old_blackboard,
 void XdsResolver::XdsConfigSelector::BuildFilterChains(
     FilterChainBuilder& builder, const Blackboard* old_blackboard,
     Blackboard* new_blackboard) {
-  route_config_data_->BuildFilterChains(
-      *xds_config_, filters_, builder, old_blackboard, new_blackboard);
+  route_config_data_->BuildFilterChains(*xds_config_, filters_, builder,
+                                        old_blackboard, new_blackboard);
 }
 
 //

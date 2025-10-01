@@ -575,7 +575,7 @@ void XdsHttpRbacFilter::AddFilter(InterceptionChainBuilder& builder) const {
 
 void XdsHttpRbacFilter::AddFilter(
     FilterChainBuilder& builder,
-    RefCountedPtr<const grpc_core::FilterConfig> config) const {
+    RefCountedPtr<const FilterConfig> config) const {
   builder.AddFilter<RbacFilter>(std::move(config));
 }
 
@@ -605,32 +605,28 @@ XdsHttpRbacFilter::GenerateServiceConfig(
   return ServiceConfigJsonEntry{"", ""};
 }
 
-RefCountedPtr<const grpc_core::FilterConfig>
-XdsHttpRbacFilter::ParseTopLevelConfig(
-      absl::string_view instance_name,
-      const XdsResourceType::DecodeContext& context, XdsExtension extension,
-      ValidationErrors* errors) const {
-// FIXME
+RefCountedPtr<const FilterConfig> XdsHttpRbacFilter::ParseTopLevelConfig(
+    absl::string_view instance_name,
+    const XdsResourceType::DecodeContext& context, XdsExtension extension,
+    ValidationErrors* errors) const {
+  // FIXME
   return nullptr;
 }
 
-RefCountedPtr<const grpc_core::FilterConfig>
-XdsHttpRbacFilter::ParseOverrideConfig(
-      absl::string_view instance_name,
-      const XdsResourceType::DecodeContext& context, XdsExtension extension,
-      ValidationErrors* errors) const {
-// FIXME
+RefCountedPtr<const FilterConfig> XdsHttpRbacFilter::ParseOverrideConfig(
+    absl::string_view instance_name,
+    const XdsResourceType::DecodeContext& context, XdsExtension extension,
+    ValidationErrors* errors) const {
+  // FIXME
   return nullptr;
 }
 
-RefCountedPtr<const grpc_core::FilterConfig> XdsHttpRbacFilter::MergeConfigs(
-    RefCountedPtr<const grpc_core::FilterConfig> top_level_config,
-    RefCountedPtr<const grpc_core::FilterConfig>
-        virtual_host_override_config,
-    RefCountedPtr<const grpc_core::FilterConfig> route_override_config,
-    RefCountedPtr<const grpc_core::FilterConfig>
-        cluster_weight_override_config) const {
-// FIXME
+RefCountedPtr<const FilterConfig> XdsHttpRbacFilter::MergeConfigs(
+    RefCountedPtr<const FilterConfig> top_level_config,
+    RefCountedPtr<const FilterConfig> virtual_host_override_config,
+    RefCountedPtr<const FilterConfig> route_override_config,
+    RefCountedPtr<const FilterConfig> cluster_weight_override_config) const {
+  // FIXME
   return nullptr;
 }
 

@@ -144,7 +144,7 @@ class StatefulSessionFilter
  private:
   const RefCountedPtr<const Config> config_;
 
-// FIXME: remove
+  // FIXME: remove
   // The relative index of instances of the same filter.
   const size_t index_;
   // Index of the service config parser.
