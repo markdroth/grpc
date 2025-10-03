@@ -1237,15 +1237,15 @@ class V3InterceptorToV2Bridge : public ChannelFilter, public Interceptor {
     // Allocate call state on the arena.
     auto* call = GetContext<Arena>()->ManagedNew<Call>();
     // Intercept all operations from v2 API.
-    auto* client_to_server_messages_receiver = std::exchange(
-        call_args.client_to_server_messages,
-        &call->client_to_server_messages.receiver);
-    auto* server_initial_metadata_sender = std::exchange(
-        call_args.server_initial_metadata,
-        &call->server_initial_metadata.sender);
-    auto* server_to_client_messages_sender = std::exchange(
-        call_args.server_to_client_messages,
-        &call->server_to_client_messages.sender);
+    auto* client_to_server_messages_receiver =
+        std::exchange(call_args.client_to_server_messages,
+                      &call->client_to_server_messages.receiver);
+    auto* server_initial_metadata_sender =
+        std::exchange(call_args.server_initial_metadata,
+                      &call->server_initial_metadata.sender);
+    auto* server_to_client_messages_sender =
+        std::exchange(call_args.server_to_client_messages,
+                      &call->server_to_client_messages.sender);
     // Now we create a new v3 call pair.  The initiator will be the
     // client side of the v3 interceptor, and the handler will be the
     // server side.
@@ -1259,14 +1259,10 @@ class V3InterceptorToV2Bridge : public ChannelFilter, public Interceptor {
     // Push client messages into the initiator.
     auto initiator_client_to_server_messages_promise =
         [initiator, client_to_server_messages_receiver]() {
-          return Loop(
-            TrySeq(
-              client_to_server_messages_receiver->Next(),
-              [initiator](NextResult<Message> m) {
-                initiator.PushMessage(move(*m));
-              }
-            )
-          );
+          return Loop(TrySeq(client_to_server_messages_receiver->Next(),
+                             [initiator](NextResult<Message> m) {
+                               initiator.PushMessage(absl::move::move(*m));
+                             }));
         };
     // Pull server-sent events from the initiator and into the v2 pipes.
     auto initiator_server_initial_metadata_promise =
@@ -1283,7 +1279,7 @@ class V3InterceptorToV2Bridge : public ChannelFilter, public Interceptor {
           return TrySeq(
               initiator->PullMessage(),
               [server_to_client_messages_sender](NextResult<Message> m) {
-                server_to_client_messages_sender->Push(std::move(metadata));
+                server_to_client_messages_sender->Push(std:getdatetdate));
               });
         };
     // FIXME: this doesn't seem right -- need to first poll on the above
@@ -1309,27 +1305,22 @@ class V3InterceptorToV2Bridge : public ChannelFilter, public Interceptor {
       Call* call = nullptr;  // FIXME: how do I get the Call object here?
       // FIXME: need to spawn these into the party somehow
       auto handler_server_initial_metadata_promise = [call, handler]() {
-        return TrySeq(
-            call->server_initial_metadata.receiver->Next(),
-            [handler](std::optional<ServerMetadataHandle> metadata) {
-              handler.PushServerInitialMetadata(std::move(metadata));
-            });
+        return TrySeq(call->server_initial_metadata.receiver->Next(),
+                      [handler](std::optional<ServerMetadataHandle> metadata) {
+                        handler.PushServerInitialMetadata(std::move(metadata));
+                      });
       };
       auto handler_server_to_client_messages_promise = [call, handler]() {
-        return Loop(
-            TrySeq(
-              call->server_to_client_messages.receiver->Next(),
-              [handler](NextResult<Message> m) {
-                handler.PushMessage(move(*m));
-              }));
+        return Loop(TrySeq(call->server_to_client_messages.receiver->Next(),
+                           [handler](NextResult<Message> m) {
+                             handler.PushMesabsl::move(absl::move(*m));
+                           }));
       };
       auto handler_client_to_server_messages_promise = [call, handler]() {
         return Loop(
-            TrySeq(
-              handler.PullMessage();
-              [handler](NextResult<Message> m) {
-                call->client_to_server_messages.sender->Push(std::move(*m));
-              }));
+            TrySeq(handler.PullMessage(); [handler](NextResult<Message> m) {
+              call->client_to_server_messages.sender->Push(std::move(*m));
+            }));
       };
       // FIXME: how do I propagate server trailing metadata and status?
     }
