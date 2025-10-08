@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 
-#ifndef GRPC_SRC_CORE_FILTER_COMPOSITE_COMPOSITE_FILTERS_H
-#define GRPC_SRC_CORE_FILTER_COMPOSITE_COMPOSITE_FILTERS_H
+#ifndef GRPC_SRC_CORE_FILTER_COMPOSITE_COMPOSITE_FILTER_H
+#define GRPC_SRC_CORE_FILTER_COMPOSITE_COMPOSITE_FILTER_H
 
 #include "src/core/filter/filter_chain.h"
 #include "src/core/lib/channel/promise_based_filter.h"
@@ -146,4 +146,4 @@ class CompositeFilter final : public V3InterceptorToV2Bridge<CompositeFilter> {
       filter_chain_map_;
 };
 
-#endif  // GRPC_SRC_CORE_FILTER_COMPOSITE_COMPOSITE_FILTERS_H
+#endif  // GRPC_SRC_CORE_FILTER_COMPOSITE_COMPOSITE_FILTER_H

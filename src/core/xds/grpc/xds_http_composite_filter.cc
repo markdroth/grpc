@@ -78,8 +78,8 @@ class SkipFilterActionFactory final : public XdsMatcherActionFactory {
 
   std::unique_ptr<XdsMatcher::Action> ParseAndCreateAction(
       const XdsResourceType::DecodeContext& context,
-      absl::string_view serialized_value, ValidationErrors* errors)
-      const override {
+      absl::string_view serialized_value,
+      ValidationErrors* errors) const override {
     const auto* skip_filter =
         envoy_extensions_filters_common_matcher_action_v3_SkipFilter_parse(
             serialized_filter_config->data(), serialized_filter_config->size(),
@@ -121,8 +121,8 @@ class ExecuteFilterActionFactory final : public XdsMatcherActionFactory {
 
   std::unique_ptr<XdsMatcher::Action> ParseAndCreateAction(
       const XdsResourceType::DecodeContext& context,
-      absl::string_view serialized_value, ValidationErrors* errors)
-      const override {
+      absl::string_view serialized_value,
+      ValidationErrors* errors) const override {
     const auto* execute_filter =
         envoy_extensions_filters_http_composite_v3_ExecuteFilterAction_parse(
             serialized_filter_config->data(), serialized_filter_config->size(),
@@ -291,8 +291,10 @@ RefCountedPtr<const FilterConfig> XdsHttpCompositeFilter::MergeConfigs(
   // because the override configs are a different protobuf message type,
   // we need to convert them to the top-level config type, which is what
   // the filter expects.
-  if (cluster_weight_override_config != nullptr) {                                  return ConvertOverrideConfigToTopLevelConfig(
-        *cluster_weight_override_config);                                         }
+  if (cluster_weight_override_config != nullptr) {
+    return ConvertOverrideConfigToTopLevelConfig(
+        *cluster_weight_override_config);
+  }
   if (route_override_config != nullptr) {
     return ConvertOverrideConfigToTopLevelConfig(*route_override_config);
   }

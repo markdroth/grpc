@@ -19,8 +19,10 @@
 namespace grpc_core {
 
 const grpc_channel_filter CompositeFilter::kFilterVtable =
-    MakePromiseBasedFilter<StatefulSessionFilter, FilterEndpoint::kClient,
-                           kFilterExaminesServerInitialMetadata|kFilterExaminesOutboundMessages|kFilterExaminesInboundMessages|kFilterExaminesCallContext>();
+    MakePromiseBasedFilter<
+        StatefulSessionFilter, FilterEndpoint::kClient,
+        kFilterExaminesServerInitialMetadata | kFilterExaminesOutboundMessages |
+            kFilterExaminesInboundMessages | kFilterExaminesCallContext>();
 
 absl::StatusOr<std::unique_ptr<CompositeFilter>> CompositeFilter::Create(
     const ChannelArgs& args, ChannelFilter::Args filter_args) {
