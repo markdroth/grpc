@@ -322,8 +322,7 @@ class ClientChannelFilter final {
   // The set of SubchannelWrapper instances referencing a given Subchannel.
   // No need to hold refs, since the map is updated in the control-plane
   // work_serializer when the SubchannelWrappers are created and destroyed.
-  absl::flat_hash_map<Subchannel*,
-                      absl::flat_hash_set<SubchannelWrapper*>>
+  absl::flat_hash_map<Subchannel*, absl::flat_hash_set<SubchannelWrapper*>>
       subchannel_map_ ABSL_GUARDED_BY(*work_serializer_);
   int keepalive_time_ ABSL_GUARDED_BY(*work_serializer_) = -1;
   grpc_error_handle disconnect_error_ ABSL_GUARDED_BY(*work_serializer_);

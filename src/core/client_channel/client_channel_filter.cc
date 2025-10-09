@@ -518,37 +518,37 @@ class ClientChannelFilter::SubchannelWrapper final
     // WorkSerializer.
     // Ref held by callback.
     WeakRef(DEBUG_LOCATION, "subchannel map cleanup").release();
-    chand_->work_serializer_->Run([this]() ABSL_EXCLUSIVE_LOCKS_REQUIRED(
-                                      *chand_->work_serializer_) {
-      auto it = chand_->subchannel_map_.find(subchannel_.get());
-      GRPC_CHECK(it != chand_->subchannel_map_.end());
-      auto& subchannel_wrappers = it->second;
-      subchannel_wrappers.erase(this);
-      if (subchannel_wrappers.empty()) {
-        if (chand_->channelz_node_ != nullptr) {
-          auto* subchannel_node = subchannel_->channelz_node();
-          if (subchannel_node != nullptr) {
-            subchannel_node->RemoveParent(chand_->channelz_node_);
+    chand_->work_serializer_->Run(
+        [this]() ABSL_EXCLUSIVE_LOCKS_REQUIRED(*chand_->work_serializer_) {
+          auto it = chand_->subchannel_map_.find(subchannel_.get());
+          GRPC_CHECK(it != chand_->subchannel_map_.end());
+          auto& subchannel_wrappers = it->second;
+          subchannel_wrappers.erase(this);
+          if (subchannel_wrappers.empty()) {
+            if (chand_->channelz_node_ != nullptr) {
+              auto* subchannel_node = subchannel_->channelz_node();
+              if (subchannel_node != nullptr) {
+                subchannel_node->RemoveParent(chand_->channelz_node_);
+              }
+            }
+            chand_->subchannel_map_.erase(it);
           }
-        }
-        chand_->subchannel_map_.erase(it);
-      }
-      if (IsSubchannelWrapperCleanupOnOrphanEnabled()) {
-        // We need to make sure that the internal subchannel gets unreffed
-        // inside of the WorkSerializer, so that updates to the local
-        // subchannel pool are properly synchronized.  To that end, we
-        // drop our ref to the internal subchannel here.  We also cancel
-        // any watchers that were not properly cancelled, in case any of
-        // them are holding a ref to the internal subchannel.
-        for (const auto& [_, watcher] : watcher_map_) {
-          subchannel_->CancelConnectivityStateWatch(watcher);
-        }
-        watcher_map_.clear();
-        data_watchers_.clear();
-        subchannel_.reset();
-      }
-      WeakUnref(DEBUG_LOCATION, "subchannel map cleanup");
-    });
+          if (IsSubchannelWrapperCleanupOnOrphanEnabled()) {
+            // We need to make sure that the internal subchannel gets unreffed
+            // inside of the WorkSerializer, so that updates to the local
+            // subchannel pool are properly synchronized.  To that end, we
+            // drop our ref to the internal subchannel here.  We also cancel
+            // any watchers that were not properly cancelled, in case any of
+            // them are holding a ref to the internal subchannel.
+            for (const auto& [_, watcher] : watcher_map_) {
+              subchannel_->CancelConnectivityStateWatch(watcher);
+            }
+            watcher_map_.clear();
+            data_watchers_.clear();
+            subchannel_.reset();
+          }
+          WeakUnref(DEBUG_LOCATION, "subchannel map cleanup");
+        });
   }
 
   void WatchConnectivityState(
