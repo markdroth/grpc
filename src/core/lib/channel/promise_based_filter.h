@@ -1296,33 +1296,32 @@ class V3InterceptorToV2Bridge : public ChannelFilter, public Interceptor {
           auto initiator_server_to_client_promise =
               [initiator, server_initial_metadata_sender,
                server_to_client_messages_sender]() mutable {
-                return TrySeq(TrySeq(initiator.PullServerInitialMetadata(),
-                                     [server_initial_metadata_sender](
-                                         std::optional<ServerMetadataHandle>
-                                             metadata) mutable {
-                                       // FIXME: check if metadata.has_value()
-                                       return server_initial_metadata_sender->
-                                           Push(std::move(*metadata));
-                                     }),
-                              ForEach(
-                                  MessagesFrom(initiator),
-                                  [server_to_client_messages_sender](
-                                      NextResult<MessageHandle> message) {
-                                    // FIXME: check if message has a value
-                                    return server_to_client_messages_sender->
-                                        Push(std::move(*message));
-                                  }));
+                return TrySeq(
+                    TrySeq(initiator.PullServerInitialMetadata(),
+                           [server_initial_metadata_sender](
+                               std::optional<ServerMetadataHandle>
+                                   metadata) mutable {
+                             // FIXME: check if metadata.has_value()
+                             return server_initial_metadata_sender->Push(
+                                 std::move(*metadata));
+                           }),
+                    ForEach(MessagesFrom(initiator),
+                            [server_to_client_messages_sender](
+                                NextResult<MessageHandle> message) {
+                              // FIXME: check if message has a value
+                              return server_to_client_messages_sender->Push(
+                                  std::move(*message));
+                            }));
               };
           // Handler-side promise for client-to-server data.
           auto handler_client_to_server_promise =
               [handler, &client_to_server_messages]() mutable {
-                return ForEach(
-                    MessagesFrom(handler),
-                    [&](NextResult<MessageHandle> message) {
-                      // FIXME: check if message has a value
-                      return client_to_server_messages.sender.Push(
-                          std::move(*message));
-                    });
+                return ForEach(MessagesFrom(handler),
+                               [&](NextResult<MessageHandle> message) {
+                                 // FIXME: check if message has a value
+                                 return client_to_server_messages.sender.Push(
+                                     std::move(*message));
+                               });
               };
           // Handler-side promise for server-to-client data.
           auto handler_server_to_client_promise =
