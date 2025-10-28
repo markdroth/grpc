@@ -262,13 +262,12 @@ void ChaoticGoodClientTransport::AbortWithError() {
                           absl::UnavailableError("transport closed"),
                           "transport closed");
   if (watcher_ != nullptr) {
-    party_arena->GetContext<EventEngine>()->Run(
-        [watcher = watcher_]() mutable {
-          ExecCtx exec_ctx;
-          // TODO(ctiller): Provide better disconnect info here.
-          watcher->OnDisconnect(absl::UnavailableError("transport closed"), {});
-          watcher.reset();  // While ExecCtx is in scope.
-        });
+    party_arena->GetContext<EventEngine>()->Run([watcher = watcher_]() mutable {
+      ExecCtx exec_ctx;
+      // TODO(ctiller): Provide better disconnect info here.
+      watcher->OnDisconnect(absl::UnavailableError("transport closed"), {});
+      watcher.reset();  // While ExecCtx is in scope.
+    });
   }
   lock.Release();
   for (auto& pair : stream_map) {
