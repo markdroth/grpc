@@ -48,7 +48,7 @@ bool ConnectionScalingEnabled() {
 
 class ConnectionScalingJsonArgs final : public JsonArgs {
  public:
-  ConnectionScalingJsonArgs(const ChannelArgs& args) : args_(args) {}
+  explicit ConnectionScalingJsonArgs(const ChannelArgs& args) : args_(args) {}
 
   bool IsEnabled(absl::string_view key) const override {
     if (key == "connection_scaling") return ConnectionScalingEnabled();
