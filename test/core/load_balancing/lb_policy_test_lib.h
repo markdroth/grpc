@@ -177,8 +177,8 @@ class LoadBalancingPolicyTest : public ::testing::Test {
               SubchannelInterface::ConnectivityStateWatcherInterface>
               watcher) override {
         auto* watcher_ptr = watcher.get();
-        auto watcher_wrapper = MakeOrphanable<WatcherWrapper>(
-            state_, std::move(watcher));
+        auto watcher_wrapper =
+            MakeOrphanable<WatcherWrapper>(state_, std::move(watcher));
         watcher_map_[watcher_ptr] = watcher_wrapper.get();
         state_->state_tracker_.AddWatcher(GRPC_CHANNEL_SHUTDOWN,
                                           std::move(watcher_wrapper));
@@ -285,10 +285,9 @@ class LoadBalancingPolicyTest : public ::testing::Test {
               << location.file() << ":" << location.line();
           break;
         case GRPC_CHANNEL_READY:
-          ASSERT_THAT(to_state,
-                      ::testing::AnyOf(GRPC_CHANNEL_IDLE,
-                                       GRPC_CHANNEL_CONNECTING,
-                                       GRPC_CHANNEL_TRANSIENT_FAILURE))
+          ASSERT_THAT(to_state, ::testing::AnyOf(
+                                    GRPC_CHANNEL_IDLE, GRPC_CHANNEL_CONNECTING,
+                                    GRPC_CHANNEL_TRANSIENT_FAILURE))
               << ConnectivityStateName(from_state) << "=>"
               << ConnectivityStateName(to_state) << "\n"
               << location.file() << ":" << location.line();
