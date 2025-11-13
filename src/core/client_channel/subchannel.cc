@@ -551,9 +551,8 @@ Subchannel::QueuedCall::QueuedCall(WeakRefCountedPtr<Subchannel> subchannel,
 }
 
 Subchannel::QueuedCall::~QueuedCall() {
-  GRPC_TRACE_LOG(subchannel_call, INFO)
-      << "subchannel " << subchannel_.get() << ": destroying queued call "
-      << this;
+  GRPC_TRACE_LOG(subchannel_call, INFO) << "subchannel " << subchannel_.get()
+                                        << ": destroying queued call " << this;
   if (after_call_stack_destroy_ != nullptr) {
     ExecCtx::Run(DEBUG_LOCATION, after_call_stack_destroy_, absl::OkStatus());
   }
@@ -619,10 +618,10 @@ void Subchannel::QueuedCall::ResumeOnConnectionLocked(
     after_call_stack_destroy_ = nullptr;
   }
   if (!error.ok()) {
-    buffered_call_.Fail(
-        error, BufferedCall::YieldCallCombinerIfPendingBatchesFound);
+    buffered_call_.Fail(error,
+                        BufferedCall::YieldCallCombinerIfPendingBatchesFound);
   } else {
-// FIXME: yield call combiner only if pending batches are found?
+    // FIXME: yield call combiner only if pending batches are found?
     buffered_call_.Resume([subchannel_call = subchannel_call_](
                               grpc_transport_stream_op_batch* batch) {
       // This will release the call combiner.
@@ -638,8 +637,8 @@ void Subchannel::QueuedCall::Fail(absl::Status status) {
   canceller_ = nullptr;
   queue_entry_ = nullptr;
   MutexLock lock(&mu_);
-  buffered_call_.Fail(
-      status, BufferedCall::YieldCallCombinerIfPendingBatchesFound);
+  buffered_call_.Fail(status,
+                      BufferedCall::YieldCallCombinerIfPendingBatchesFound);
 }
 
 //
@@ -711,7 +710,7 @@ class Subchannel::ConnectedSubchannelStateWatcher final
     : public AsyncConnectivityStateWatcherInterface {
  public:
   // Must be instantiated while holding c->mu.
-  ConnectedSubchannelStateWatcher(
+  explicit ConnectedSubchannelStateWatcher(
       RefCountedPtr<ConnectedSubchannel> connected_subchannel)
       : connected_subchannel_(std::move(connected_subchannel)) {}
 
@@ -759,7 +758,7 @@ class Subchannel::ConnectedSubchannelStateWatcher final
 class Subchannel::ConnectionStateWatcher final
     : public Transport::StateWatcher {
  public:
-  ConnectionStateWatcher(
+  explicit ConnectionStateWatcher(
       RefCountedPtr<ConnectedSubchannel> connected_subchannel)
       : connected_subchannel_(std::move(connected_subchannel)) {}
 
@@ -767,9 +766,9 @@ class Subchannel::ConnectionStateWatcher final
                     DisconnectInfo disconnect_info) override {
     Subchannel* subchannel = connected_subchannel_->subchannel();
     GRPC_TRACE_LOG(subchannel, INFO)
-        << "subchannel " << subchannel << " "
-        << subchannel->key_.ToString() << ": connected subchannel "
-        << connected_subchannel_.get() << " reports disconnection: " << status;
+        << "subchannel " << subchannel << " " << subchannel->key_.ToString()
+        << ": connected subchannel " << connected_subchannel_.get()
+        << " reports disconnection: " << status;
     MutexLock lock(&subchannel->mu_);
     // Handle keepalive update.
     if (disconnect_info.keepalive_time.has_value()) {
@@ -799,10 +798,9 @@ class Subchannel::ConnectionStateWatcher final
       override {
     Subchannel* subchannel = connected_subchannel_->subchannel();
     GRPC_TRACE_LOG(subchannel, INFO)
-        << "subchannel " << subchannel << " "
-        << subchannel->key_.ToString() << ": connection "
-        << connected_subchannel_.get() << ": setting MAX_CONCURRENT_STREAMS="
-        << max_concurrent_streams;
+        << "subchannel " << subchannel << " " << subchannel->key_.ToString()
+        << ": connection " << connected_subchannel_.get()
+        << ": setting MAX_CONCURRENT_STREAMS=" << max_concurrent_streams;
     if (connected_subchannel_->SetMaxConcurrentStreams(
             max_concurrent_streams)) {
       subchannel->RetryQueuedRpcs();
@@ -1111,19 +1109,17 @@ void Subchannel::RemoveDataProducer(DataProducerInterface* data_producer) {
 
 void Subchannel::SetLastFailureLocked(const absl::Status& status) {
   // Augment status message to include IP address.
-  last_failure_status_ =
-      absl::Status(status.code(),
-                   absl::StrCat(grpc_sockaddr_to_uri(&key_.address())
-                                    .value_or("<unknown address type>"),
-                                ": ", status.message()));
-  status.ForEachPayload(
-      [this](absl::string_view key, const absl::Cord& value)
-      // Want to use ABSL_EXCLUSIVE_LOCKS_REQUIRED(&mu_) here,
-      // but that won't work, because we can't pass the lock
-      // annotation through absl::Status::ForEachPayload().
-      ABSL_NO_THREAD_SAFETY_ANALYSIS {
-        last_failure_status_.SetPayload(key, value);
-      });
+  last_failure_status_ = absl::Status(
+      status.code(), absl::StrCat(grpc_sockaddr_to_uri(&key_.address())
+                                      .value_or("<unknown address type>"),
+                                  ": ", status.message()));
+  status.ForEachPayload([this](absl::string_view key, const absl::Cord& value)
+                        // Want to use ABSL_EXCLUSIVE_LOCKS_REQUIRED(&mu_) here,
+                        // but that won't work, because we can't pass the lock
+                        // annotation through absl::Status::ForEachPayload().
+                        ABSL_NO_THREAD_SAFETY_ANALYSIS {
+                          last_failure_status_.SetPayload(key, value);
+                        });
 }
 
 grpc_connectivity_state Subchannel::ComputeConnectivityStateLocked() const {
@@ -1362,8 +1358,8 @@ bool Subchannel::PublishTransportLocked() {
         MakeRefCounted<ConnectionStateWatcher>(connected_subchannel));
   } else {
     connected_subchannel->StartWatch(
-        pollset_set_, MakeOrphanable<ConnectedSubchannelStateWatcher>(
-                          connected_subchannel));
+        pollset_set_,
+        MakeOrphanable<ConnectedSubchannelStateWatcher>(connected_subchannel));
   }
   connections_.push_back(std::move(connected_subchannel));
   RetryQueuedRpcsLocked();
@@ -1443,9 +1439,9 @@ void Subchannel::RetryQueuedRpcsLocked() {
 }
 
 void Subchannel::FailAllQueuedRpcsLocked() {
-// FIXME: need to indicate somehow that this is eligible for transparent retries
-// (maybe handle this by modifying the recv_trailing_metadata batch
-// inside of QueuedCall::Fail()?)
+  // FIXME: need to indicate somehow that this is eligible for transparent
+  // retries (maybe handle this by modifying the recv_trailing_metadata batch
+  // inside of QueuedCall::Fail()?)
   absl::Status status =
       absl::UnavailableError("subchannel lost all connections");
   for (QueuedCall* queued_call : queued_calls_) {
