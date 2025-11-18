@@ -782,7 +782,7 @@ class Subchannel::ConnectedSubchannelStateWatcher final
     : public AsyncConnectivityStateWatcherInterface {
  public:
   // Must be instantiated while holding c->mu.
-  ConnectedSubchannelStateWatcher(
+  explicit ConnectedSubchannelStateWatcher(
       RefCountedPtr<ConnectedSubchannel> connected_subchannel)
       : connected_subchannel_(std::move(connected_subchannel)) {}
 
@@ -830,7 +830,7 @@ class Subchannel::ConnectedSubchannelStateWatcher final
 class Subchannel::ConnectionStateWatcher final
     : public Transport::StateWatcher {
  public:
-  ConnectionStateWatcher(
+  explicit ConnectionStateWatcher(
       RefCountedPtr<ConnectedSubchannel> connected_subchannel)
       : connected_subchannel_(std::move(connected_subchannel)) {}
 
