@@ -1444,7 +1444,8 @@ class NewSubchannel::QueuedCallInterface {
 //
 
 class NewSubchannel::QueuedCall final
-    : public Subchannel::Call, public NewSubchannel::QueuedCallInterface {
+    : public Subchannel::Call,
+      public NewSubchannel::QueuedCallInterface {
  public:
   QueuedCall(WeakRefCountedPtr<NewSubchannel> subchannel, CreateCallArgs args);
   ~QueuedCall() override;
@@ -2393,8 +2394,8 @@ bool NewSubchannel::PublishTransportLocked() {
       socket_node->AddParent(channelz_node_.get());
     }
   }
-  transport->StartWatch(MakeRefCounted<ConnectionStateWatcher>(
-      connected_subchannel->WeakRef()));
+  transport->StartWatch(
+      MakeRefCounted<ConnectionStateWatcher>(connected_subchannel->WeakRef()));
   connections_.push_back(std::move(connected_subchannel));
   RetryQueuedRpcsLocked();
   MaybeUpdateConnectivityStateLocked();
