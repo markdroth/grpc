@@ -962,7 +962,7 @@ class ParseXdsGrpcServiceTest : public XdsCommonTypesTest {
 
 TEST_F(ParseXdsGrpcServiceTest,
        NonTrustedXdsServerAndServicePresentInBootstrap) {
-// FIXME: add service in bootstrap
+  // FIXME: add service in bootstrap
   GrpcService grpc_service;
   grpc_service.mutable_timeout()->set_seconds(5);
   auto* header_value = grpc_service.add_initial_metadata();
@@ -970,7 +970,7 @@ TEST_F(ParseXdsGrpcServiceTest,
   header_value->set_value("bar");
   auto* google_grpc = grpc_service.mutable_google_grpc();
   google_grpc->set_target_uri("dns:server.example.com");
-// FIXME: set creds
+  // FIXME: set creds
   auto xds_grpc_service = Parse(grpc_service);
   ASSERT_TRUE(xds_grpc_service.ok()) << xds_grpc_service.status();
   EXPECT_EQ(xds_grpc_service->timeout, Duration::Seconds(5));
@@ -979,7 +979,7 @@ TEST_F(ParseXdsGrpcServiceTest,
   ASSERT_NE(xds_grpc_service->server_target, nullptr);
   EXPECT_EQ(xds_grpc_service->server_target->server_uri(),
             "dns:server.example.com");
-// FIXME: check creds
+  // FIXME: check creds
 }
 
 TEST_F(ParseXdsGrpcServiceTest,
@@ -992,12 +992,11 @@ TEST_F(ParseXdsGrpcServiceTest,
   auto* google_grpc = grpc_service.mutable_google_grpc();
   google_grpc->set_target_uri("dns:server.example.com");
   auto xds_grpc_service = Parse(grpc_service);
-  EXPECT_EQ(
-      xds_grpc_service.status(),
-      absl::InvalidArgumentError(
-          "validation failed: [field:grpc_service.target_uri "
-          "error:service not present in \"allowed_grpc_services\" in "
-          "bootstrap config]"));
+  EXPECT_EQ(xds_grpc_service.status(),
+            absl::InvalidArgumentError(
+                "validation failed: [field:grpc_service.target_uri "
+                "error:service not present in \"allowed_grpc_services\" in "
+                "bootstrap config]"));
 }
 
 }  // namespace
