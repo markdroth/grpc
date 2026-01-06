@@ -51,14 +51,14 @@ class TestChannelCredsFactory : public ChannelCredsFactory<> {
   RefCountedPtr<const ChannelCredsConfig> ParseProto(
       absl::string_view /*serialized_proto*/,
       const CertificateProviderStoreInterface::PluginDefinitionMap&
-          /*certificate_provider_definitions*/,
+      /*certificate_provider_definitions*/,
       ValidationErrors* /*errors*/) const override {
     return nullptr;
   }
   RefCountedPtr<grpc_channel_credentials> CreateChannelCreds(
       RefCountedPtr<const ChannelCredsConfig> /*config*/,
       const CertificateProviderStoreInterface&
-          /*certificate_provider_store*/) const override {
+      /*certificate_provider_store*/) const override {
     return RefCountedPtr<grpc_channel_credentials>(
         grpc_fake_transport_security_credentials_create());
   }
@@ -218,10 +218,8 @@ TEST_F(ChannelCredsRegistryTest, TlsCredsProto) {
   FileWatcherCertificateProviderFactory cert_provider_factory;
   ValidationErrors errors;
   cert_provider_map_["foo"] = {
-      "foo",
-      cert_provider_factory.CreateCertificateProviderConfig(
-          json, JsonArgs(), &errors)
-  };
+      "foo", cert_provider_factory.CreateCertificateProviderConfig(
+                 json, JsonArgs(), &errors)};
   ASSERT_TRUE(errors.ok()) << errors.message("unexpected errors");
   // Now construct TlsCredentials extension proto.
   envoy::extensions::grpc_service::channel_credentials::tls::v3::TlsCredentials
