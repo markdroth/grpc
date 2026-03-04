@@ -1222,7 +1222,7 @@ class FilterChainBuilderImpl final : public FilterChainBuilder {
     builder_ =
         std::make_unique<InterceptionChainBuilder>(channel_args_, blackboard_);
     builder_->AddOnClientInitialMetadata(on_client_initial_metadata_);
-// FIXME: is this the right order with respect to the xDS filters?
+    // FIXME: is this the right order with respect to the xDS filters?
     CoreConfiguration::Get().channel_init().AddToInterceptionChainBuilder(
         GRPC_SERVER_CHANNEL, *builder_);
   }
@@ -1248,7 +1248,7 @@ class ServerConfigSelectorCallDestination final
         on_client_initial_metadata_(std::move(on_client_initial_metadata)),
         destination_(std::move(destination)),
         config_selector_(nullptr) {
-// FIXME: do we need to grab the initial config selector from here first?
+    // FIXME: do we need to grab the initial config selector from here first?
     (void)provider_->Watch(std::make_unique<Watcher>(
         WeakRefAsSubclass<ServerConfigSelectorCallDestination>()));
   }
@@ -1260,27 +1260,29 @@ class ServerConfigSelectorCallDestination final
          last_config_selector =
              absl::StatusOr<RefCountedPtr<ServerConfigSelector>>(nullptr),
          unstarted_handler]() mutable {
-          return Map(
-              self->config_selector_.Next(last_config_selector),
-              [self, unstarted_handler, &last_config_selector](
-                  absl::StatusOr<RefCountedPtr<ServerConfigSelector>>
-                      config_selector) mutable {
-                last_config_selector = std::move(config_selector);
-                if (!last_config_selector.ok()) {
-                  return last_config_selector.status();
-                }
-                auto call_config = (*last_config_selector)->GetCallConfig(
-                    &unstarted_handler.UnprocessedClientInitialMetadata());
-                if (!call_config.ok()) return call_config.status();
-                if (!call_config->filter_chain.ok()) {
-                  return call_config->filter_chain.status();
-                }
-                auto& filter_chain = DownCast<const FilterChainImpl&>(
-                    **call_config->filter_chain);
-                auto destination = filter_chain.destination();
-                destination->StartCall(std::move(unstarted_handler));
-                return absl::OkStatus();
-              });
+          return Map(self->config_selector_.Next(last_config_selector),
+                     [self, unstarted_handler, &last_config_selector](
+                         absl::StatusOr<RefCountedPtr<ServerConfigSelector>>
+                             config_selector) mutable {
+                       last_config_selector = std::move(config_selector);
+                       if (!last_config_selector.ok()) {
+                         return last_config_selector.status();
+                       }
+                       auto call_config =
+                           (*last_config_selector)
+                               ->GetCallConfig(
+                                   &unstarted_handler
+                                        .UnprocessedClientInitialMetadata());
+                       if (!call_config.ok()) return call_config.status();
+                       if (!call_config->filter_chain.ok()) {
+                         return call_config->filter_chain.status();
+                       }
+                       auto& filter_chain = DownCast<const FilterChainImpl&>(
+                           **call_config->filter_chain);
+                       auto destination = filter_chain.destination();
+                       destination->StartCall(std::move(unstarted_handler));
+                       return absl::OkStatus();
+                     });
         });
   }
 
@@ -1295,8 +1297,8 @@ class ServerConfigSelectorCallDestination final
         : destination_(std::move(destination)) {}
 
     void OnServerConfigSelectorUpdate(
-        absl::StatusOr<RefCountedPtr<ServerConfigSelector>>
-            config_selector) override {
+        absl::StatusOr<RefCountedPtr<ServerConfigSelector>> config_selector)
+        override {
       destination_->OnServerConfigSelectorUpdate(std::move(config_selector));
     }
 
@@ -1310,8 +1312,8 @@ class ServerConfigSelectorCallDestination final
       config_selector_.Set(config_selector.status());
       return;
     }
-    FilterChainBuilderImpl builder(
-        args_, blackboard_.get(), on_client_initial_metadata_, destination_);
+    FilterChainBuilderImpl builder(args_, blackboard_.get(),
+                                   on_client_initial_metadata_, destination_);
     (*config_selector)->BuildFilterChains(builder);
     config_selector_.Set(std::move(config_selector));
   }
@@ -1335,8 +1337,8 @@ Server::MakeCallDestination(const ChannelArgs& args,
   auto on_client_initial_metadata = [self = Ref()](ClientMetadata& md) {
     self->SetRegisteredMethodOnMetadata(md);
   };
-  auto destination = MakeCallDestinationFromHandlerFunction(
-      [this](CallHandler handler) {
+  auto destination =
+      MakeCallDestinationFromHandlerFunction([this](CallHandler handler) {
         return MatchAndPublishCall(std::move(handler));
       });
   // If we have a ServerConfigSelectorProvider, use a
@@ -1347,9 +1349,8 @@ Server::MakeCallDestination(const ChannelArgs& args,
   if (IsXdsServerFilterChainPerRouteEnabled() &&
       server_config_selector_provider != nullptr) {
     return MakeRefCounted<ServerConfigSelectorCallDestination>(
-        std::move(server_config_selector_provider), args,
-        std::move(blackboard), std::move(on_client_initial_metadata),
-        std::move(destination));
+        std::move(server_config_selector_provider), args, std::move(blackboard),
+        std::move(on_client_initial_metadata), std::move(destination));
   }
   // No ServerConfigSelectorCallDestination, so construct a filter chain
   // directly.
@@ -1514,7 +1515,7 @@ grpc_error_handle Server::SetupTransport(Transport* transport,
     ++connections_open_;
     stream_quota_->IncrementOpenChannels();
   } else {
-// FIXME: figure out how to deter filter stack creation
+    // FIXME: figure out how to deter filter stack creation
     GRPC_CHECK(transport->filter_stack_transport() != nullptr);
     absl::StatusOr<RefCountedPtr<Channel>> channel = LegacyChannel::Create(
         "",
@@ -2240,10 +2241,10 @@ void Server::CallData::StartTransportStreamOpBatchImpl(
     grpc_call_next_op(elem, batch);
     return;
   }
-// FIXME: use server config selector
-// note: needs to be here instead of in the ServerConfigSelectorFilter,
-// because we need to know which type of FilterChainBuilder to create
-// based on whether we're running v1 stack or v3 stack
+  // FIXME: use server config selector
+  // note: needs to be here instead of in the ServerConfigSelectorFilter,
+  // because we need to know which type of FilterChainBuilder to create
+  // based on whether we're running v1 stack or v3 stack
 }
 
 void Server::CallData::RecvInitialMetadataReady(void* arg,
