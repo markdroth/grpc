@@ -52,19 +52,19 @@ class CdsChildNameStateTest : public ::testing::Test {
 
   static XdsConfig::ClusterConfig::EndpointConfig MakeEndpointConfig(
       const std::shared_ptr<const XdsEndpointResource> endpoint_resource) {
-    return XdsConfig::ClusterConfig::EndpointConfig(
-        std::move(endpoint_resource), /*resolution_note=*/"");
+    return XdsConfig::ClusterConfig::EndpointConfig(endpoint_resource,
+                                                    /*resolution_note=*/"");
   }
 
   static XdsConfig::ClusterConfig::EndpointConfig MakeEndpointConfig(
       const std::vector<std::vector<std::string /*sub_zone*/>> priorities) {
-    return MakeEndpointConfig(MakeEndpointResource(std::move(priorities)));
+    return MakeEndpointConfig(MakeEndpointResource(priorities));
   }
 
   static XdsConfig::ClusterConfig MakeClusterConfig(
       const std::shared_ptr<const XdsEndpointResource> endpoint_resource) {
     return XdsConfig::ClusterConfig(
-        /*cluster=*/nullptr, std::move(endpoint_resource),
+        /*cluster=*/nullptr, endpoint_resource,
         /*resolution_note=*/"");
   }
 };
