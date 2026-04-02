@@ -392,7 +392,7 @@ class XdsServerConfigFetcher::ListenerWatcher::FilterChainMatchManager::
   // a pointer to the HTTP filters within that LDS resource, rather than
   // copying the HTTP filters here.
   const std::vector<XdsListenerResource::HttpConnectionManager::HttpFilter>
-     http_filters_;
+      http_filters_;
 
   std::vector<VirtualHost> virtual_hosts_;
 };
@@ -1138,7 +1138,7 @@ void XdsServerConfigFetcher::ListenerWatcher::FilterChainMatchManager::
                                           new_blackboard);
             continue;
           }
-// FIXME: this is wrong -- need to do the MergeConfigs() thing
+          // FIXME: this is wrong -- need to do the MergeConfigs() thing
           filter_impl->UpdateBlackboard(*http_filter.filter_config,
                                         old_blackboard, new_blackboard);
         }
@@ -1253,7 +1253,7 @@ XdsServerConfigFetcher::ListenerWatcher::FilterChainMatchManager::
     // Found the matching route
     if (!std::holds_alternative<
             XdsRouteConfigResource::Route::NonForwardingAction>(
-                route.route->action)) {
+            route.route->action)) {
       return absl::UnavailableError("matching route has unsupported action");
     }
     if (route.method_config != nullptr) {
@@ -1317,8 +1317,8 @@ XdsServerConfigFetcher::ListenerWatcher::FilterChainMatchManager::
   if (!resource.ok()) {
     return resource.status();
   }
-  return XdsServerConfigSelector::Create(
-      xds_client_, resource.value(), http_filters_);
+  return XdsServerConfigSelector::Create(xds_client_, resource.value(),
+                                         http_filters_);
 }
 
 void XdsServerConfigFetcher::ListenerWatcher::FilterChainMatchManager::
