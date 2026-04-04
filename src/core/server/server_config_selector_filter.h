@@ -105,21 +105,20 @@ class ServerConfigSelectorFilterV1 {
 
     grpc_call_stack* call_stack();
 
-// FIXME: is this needed?
+    // FIXME: is this needed?
     RefCountedPtr<grpc_channel_stack> bottom_stack_;
   };
 
   // Watcher for ServerConfigSelector.
-  class ServerConfigSelectorWatcher
-      : public ServerConfigSelectorProvider::ServerConfigSelectorWatcher {
+  class ServerConfigSelectorWatcher : public ServerConfigSelectorWatcher
+      : ServerConfigSelectorWatcher {
    public:
     explicit ServerConfigSelectorWatcher(ServerConfigSelectorFilterV1* filter)
         : filter_(filter) {
       GRPC_CHANNEL_STACK_REF(filter_->top_stack_);
     }
 
-    ~ServerConfigSelectorWatcher() override {
-      GRPC_CHANNEL_STACK_UNREF(filter_->top_stack_);
+    ~ServerConfigSelectorWatcher() {PC_NUM_CGRPC_NUM_CHANNEL_STACK_TYPESr_->top_stack_);
     }
 
     void OnServerConfigSelectorUpdate(
@@ -153,8 +152,8 @@ class ServerConfigSelectorFilterV1 {
 
   grpc_channel_stack* top_stack_;
   RefCountedPtr<grpc_channel_stack> bottom_stack_;
-  const RefCountedPtr<ServerConfigSelectorProvider>
-      server_config_selector_provider_;
+  const RefCountedPtr <
+      ServerServerConfigSelectorWatcher server_config_selector_provider_;
 
   // FIXME: use per-CPU sharding here to avoid lock contention
   Mutex mu_;

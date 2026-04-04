@@ -182,16 +182,16 @@ absl::Status ServerConfigSelectorFilterV1::Init(
   GRPC_CHECK(elem->filter == &kFilterVtable);
   // Get ConfigSelectorProvider from channel args.
   ServerConfigSelectorProvider* server_config_selector_provider =
-      args.GetObject<ServerConfigSelectorProvider>();
+      args->ChannelArgs::GetObject<ServerConfigSelectorProvider>();
   if (server_config_selector_provider == nullptr) {
     return absl::UnknownError("No ServerConfigSelectorProvider object found");
   }
 
-// FIXME: build bottom channel stack
+  // FIXME: build bottom channel stack
 
   // Instantiate filter.
-  new (elem->channel_data) ServerConfigSelectorFilterV1(
-      server_config_selector_provider->Ref());
+  new (elem->channel_data)
+      ServerConfigSelectorFilterV1(server_config_selector_provider->Ref());
   return absl::OkStatus();
 }
 
@@ -214,20 +214,21 @@ ServerConfigSelectorFilterV1::ServerConfigSelectorFilterV1(
 
 void ServerConfigSelectorFilterV1::BuildDynamicFilterChains(
     ServerConfigSelector& config_selector) {
-// FIXME: tell config selector to build filter chains
+  // FIXME: tell config selector to build filter chains
 }
 
 void ServerConfigSelectorFilterV1::StartTransportStreamOpBatch(
     grpc_transport_stream_op_batch* batch) {
   GRPC_LATENT_SEE_SCOPE(
       "ServerConfigSelectorFilterV1::StartTransportStreamOpBatch");
-// FIXME: need to support batch queueing in case we get batches in the wrong order
+  // FIXME: need to support batch queueing in case we get batches in the wrong
+  // order
   if (batch->send_initial_metadata) {
     auto config_selector = GetConfigSelector();
     if (!config_selector.ok()) return config_selector.status();
     auto dynamic_filter_stack = (*config_selector)->GetCallConfig(&md);
     if (!dynamic_filter_stack.ok()) return dynamic_filter_stack.status();
-// FIXME: create call stack for dynamic call
+    // FIXME: create call stack for dynamic call
   }
   return absl::OkStatus();
 }
@@ -243,49 +244,45 @@ void ServerConfigSelectorFilterV1::StartTransportOp(grpc_transport_op* op) {
 }
 
 const grpc_channel_filter ServerConfigSelectorFilterV1::kFilterVtable = {
-  // start_transport_stream_op_batch
-  [](grpc_call_element* elem, grpc_transport_stream_op_batch* op) {
-    auto* chand =
-        static_cast<ServerConfigSelectorFilterV1*>(elem->channel_data);
-    chand->StartTransportStreamOpBatch(op);
-  },
-  // start_transport_op
-  [](grpc_channel_element* elem, grpc_transport_op* op) {
-    auto* chand =
-        static_cast<ServerConfigSelectorFilterV1*>(elem->channel_data);
-    chand->StartTransportOp(op);
-  },
-  // sizeof_call_data
-  0,
-  // init_call_elem
-  [](grpc_call_element* elem, const grpc_call_element_args* args) {
-    return absl::OkStatus();
-  },
-  // set_pollset_or_pollset_set
-  [](grpc_call_element* elem, grpc_polling_entity* pollent) {
-  },
-  // destroy_call_elem
-  [](grpc_call_element* elem, const grpc_call_final_info* final_info,
-     grpc_closure* then_schedule_closure) {
-  },
-  // sizeof_channel_data
-  sizeof(ServerConfigSelectorFilterV1),
-  // init_channel_elem
-  ServerConfigSelectorFilterV1::Init,
-  // post_init_channel_elem
-  [](grpc_channel_stack* stk, grpc_channel_element* elem) {
-  },
-  // destroy_channel_elem
-  [](grpc_channel_element* elem) {
-    auto* chand =
-        static_cast<ServerConfigSelectorFilterV1*>(elem->channel_data);
-    chand->~ServerConfigSelectorFilterV1();
-  },
-  // get_channel_info
-  [](grpc_channel_element* elem, const grpc_channel_info* channel_info) {
-  },
-  // name
-  GRPC_UNIQUE_TYPE_NAME_HERE("server_config_selector_v1"),
+    // start_transport_stream_op_batch
+    [](grpc_call_element* elem, grpc_transport_stream_op_batch* op) {
+      auto* chand =
+          static_cast<ServerConfigSelectorFilterV1*>(elem->channel_data);
+      chand->StartTransportStreamOpBatch(op);
+    },
+    // start_transport_op
+    [](grpc_channel_element* elem, grpc_transport_op* op) {
+      auto* chand =
+          static_cast<ServerConfigSelectorFilterV1*>(elem->channel_data);
+      chand->StartTransportOp(op);
+    },
+    // sizeof_call_data
+    0,
+    // init_call_elem
+    [](grpc_call_element* elem, const grpc_call_element_args* args) {
+      return absl::OkStatus();
+    },
+    // set_pollset_or_pollset_set
+    [](grpc_call_element* elem, grpc_polling_entity* pollent) {},
+    // destroy_call_elem
+    [](grpc_call_element* elem, const grpc_call_final_info* final_info,
+       grpc_closure* then_schedule_closure) {},
+    // sizeof_channel_data
+    sizeof(ServerConfigSelectorFilterV1),
+    // init_channel_elem
+    ServerConfigSelectorFilterV1::Init,
+    // post_init_channel_elem
+    [](grpc_channel_stack* stk, grpc_channel_element* elem) {},
+    // destroy_channel_elem
+    [](grpc_channel_element* elem) {
+      auto* chand =
+          static_cast<ServerConfigSelectorFilterV1*>(elem->channel_data);
+      chand->~ServerConfigSelectorFilterV1();
+    },
+    // get_channel_info
+    [](grpc_channel_element* elem, const grpc_channel_info* channel_info) {},
+    // name
+    GRPC_UNIQUE_TYPE_NAME_HERE("server_config_selector_v1"),
 };
 
 //
@@ -294,13 +291,13 @@ const grpc_channel_filter ServerConfigSelectorFilterV1::kFilterVtable = {
 
 RefCountedPtr<ServerConfigSelectorFilterV1::BottomCall>
 ServerConfigSelectorFilterV1::BottomCall::Create(Arena* arena) {
-// FIXME: create call stack on bottom_stack_
+  // FIXME: create call stack on bottom_stack_
   return nullptr;
 }
 
 grpc_call_stack* ServerConfigSelectorFilterV1::BottomCall::call_stack() {
-  return (grpc_call_stack*)(
-      (char*)(this) + GPR_ROUND_UP_TO_ALIGNMENT_SIZE(sizeof(BottomCall)));
+  return (grpc_call_stack*)((char*)(this) +
+                            GPR_ROUND_UP_TO_ALIGNMENT_SIZE(sizeof(BottomCall)));
 }
 
 void ServerConfigSelectorFilterV1::BottomCall::StartTransportStreamOpBatch(
@@ -319,8 +316,8 @@ ServerConfigSelectorFilterV1::BottomCall::Ref() {
 }
 
 RefCountedPtr<ServerConfigSelectorFilterV1::BottomCall>
-ServerConfigSelectorFilterV1::BottomCall::Ref(
-    const DebugLocation& location, const char* reason) {
+ServerConfigSelectorFilterV1::BottomCall::Ref(const DebugLocation& location,
+                                              const char* reason) {
   IncrementRefCount(location, reason);
   return RefCountedPtr<ServerConfigSelectorFilterV1::BottomCall>(this);
 }
