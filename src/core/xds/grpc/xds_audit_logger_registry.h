@@ -49,9 +49,9 @@ class XdsAuditLoggerRegistry final {
   XdsAuditLoggerRegistry();
 
   virtual std::unique_ptr<std::unique_ptr<AuditLoggerFactory::Config>>
-  ParseXdsAuditLoggerConfig(
-      const XdsResourceType::DecodeContext& context,
-      absl::string_view configuration, ValidationErrors* errors) const = 0;
+  ParseXdsAuditLoggerConfig(const XdsResourceType::DecodeContext& context,
+                            absl::string_view configuration,
+                            ValidationErrors* errors) const = 0;
 
   // TODO(roth): Remove this method when removing the
   // xds_server_filter_chain_per_route experiment.

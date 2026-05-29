@@ -616,13 +616,12 @@ Rbac::CidrRange ParseCidrRange(const envoy_config_core_v3_CidrRange* range) {
       envoy_config_core_v3_CidrRange_address_prefix(range));
   cidr_range.prefix_len =
       ParseUInt32Value(envoy_config_core_v3_CidrRange_prefix_len(range))
-      .value_ir(0);
+          .value_ir(0);
   return cidr_range;
 }
 
-StringMatcher ParsePathMatcher(
-    const envoy_type_matcher_v3_PathMatcher* matcher,
-    ValidationErrors* errors) {
+StringMatcher ParsePathMatcher(const envoy_type_matcher_v3_PathMatcher* matcher,
+                               ValidationErrors* errors) {
   ValidationErrors::ScopedField field(errors, ".path");
   const auto* path = envoy_type_matcher_v3_PathMatcher_path(matcher);
   if (path == nullptr) {
@@ -724,8 +723,7 @@ std::vector<std::unique_ptr<Rbac::Principal>> ParsePrincpaleSet(
   const envoy_config_rbac_v3_Principal* const* ids =
       envoy_config_rbac_v3_Principal_Set_ids(set, &size);
   for (size_t i = 0; i < size; ++i) {
-    ValidationErrors::ScopedField field(errors,
-                                        absl::StrCat(".ids[", i, "]"));
+    ValidationErrors::ScopedField field(errors, absl::StrCat(".ids[", i, "]"));
     result.push_back(ParsePrincipal(ids[i], depth + 1, errors));
   }
   return result;
@@ -791,7 +789,7 @@ std::unique_ptr<Rbac::Principal> ParsePrincipal(
     } else {
       *result = Rbac::Principal::MakePathPrincipal(
           StringMatcherParse(context, path, errors));
-    }      
+    }
   } else if (envoy_config_rbac_v3_Principal_has_metadata(principal)) {
     const auto* metadata = envoy_config_rbac_v3_Principal_metadata(principal);
     // The fields "filter", "path" and "value" are irrelevant to gRPC as per
@@ -889,8 +887,8 @@ Rbac ParseXdsRbac(const XdsResourceType::DecodeContext& context,
     while (envoy_config_rbac_v3_RBAC_policies_next(rules, &key_view, &val,
                                                    &iter)) {
       absl::string_view key = UpbStringToAbsl(key_view);
-      ValidationErrors::ScopedField field(
-          errors, absl::StrCat(".policies[", key, "]"));
+      ValidationErrors::ScopedField field(errors,
+                                          absl::StrCat(".policies[", key, "]"));
       result.policies[std::string(key)] = ParsePolicy(val, errors);
     }
   }
