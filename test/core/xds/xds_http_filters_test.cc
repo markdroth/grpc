@@ -564,7 +564,7 @@ TEST_F(XdsRbacFilterTest, ParseTopLevelConfig) {
   ASSERT_TRUE(errors_.ok()) << errors_.status(
       absl::StatusCode::kInvalidArgument, "unexpected errors");
   ASSERT_NE(config, nullptr);
-// FIXME
+  // FIXME
   EXPECT_EQ(config->ToString(), "");
 }
 
