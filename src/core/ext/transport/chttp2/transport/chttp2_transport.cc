@@ -702,9 +702,8 @@ void grpc_chttp2_transport::WriteSecurityFrameLocked(
   }
   if (!settings.peer().allow_security_frame()) {
     close_transport_locked(
-        this,
-        absl::FailedPreconditionError(
-            "Unexpected SECURITY frame scheduled for write"));
+        this, absl::FailedPreconditionError(
+                  "Unexpected SECURITY frame scheduled for write"));
     return;
   }
   grpc_core::SliceBuffer security_frame;
@@ -2050,8 +2049,8 @@ void grpc_chttp2_keepalive_timeout(
                 grpc_core::StatusIntProperty::kHttp2Error,
                 static_cast<intptr_t>(Http2ErrorCode::kEnhanceYourCalm)),
             /*immediate_disconnect_hint=*/true);
-        close_transport_locked(
-            t.get(), absl::UnavailableError("keepalive timeout"));
+        close_transport_locked(t.get(),
+                               absl::UnavailableError("keepalive timeout"));
       }),
       absl::OkStatus());
 }
@@ -2087,8 +2086,8 @@ void grpc_chttp2_settings_timeout(
                 grpc_core::StatusIntProperty::kHttp2Error,
                 static_cast<intptr_t>(Http2ErrorCode::kSettingsTimeout)),
             /*immediate_disconnect_hint=*/true);
-        close_transport_locked(
-            t.get(), absl::UnavailableError("settings timeout"));
+        close_transport_locked(t.get(),
+                               absl::UnavailableError("settings timeout"));
       }),
       absl::OkStatus());
 }
@@ -2485,8 +2484,7 @@ void grpc_chttp2_cancel_stream(
     grpc_error_handle due_to_error, bool tarpit,
     grpc_core::ServerMetadataHandle send_trailing_metadata) {
   if (!t->is_client && !s->sent_trailing_metadata &&
-      !absl::IsUnknown(due_to_error) &&
-      !(s->read_closed && s->write_closed)) {
+      !absl::IsUnknown(due_to_error) && !(s->read_closed && s->write_closed)) {
     close_from_api(t, s, due_to_error, tarpit,
                    std::move(send_trailing_metadata));
     return;
