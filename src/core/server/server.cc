@@ -173,8 +173,7 @@ void Server::ListenerState::Start() {
 
 void Server::ListenerState::Stop(bool send_goaways, Duration grace_period) {
   GRPC_TRACE_LOG(server, INFO)
-      << "[server " << server_.get() << " ListenerState " << this
-      << "] Stop()";
+      << "[server " << server_.get() << " ListenerState " << this << "] Stop()";
   absl::flat_hash_set<OrphanablePtr<ListenerInterface::LogicalConnection>>
       connections;
   if (send_goaways) {
@@ -366,7 +365,7 @@ void Server::ListenerState::DrainConnectionsLocked(Duration grace_period) {
   for (auto& connection : connections_) {
     connection->SendGoAway();
   }
-// FIXME: use infinite future instead of zero here?
+  // FIXME: use infinite future instead of zero here?
   if (grace_period == Duration::Zero()) return;
   auto& connections_to_be_drained = draining_connections_list_.emplace_back();
   connections_to_be_drained.connections = std::move(connections_);
@@ -1571,8 +1570,7 @@ void Server::MaybeFinishShutdown() {
       IsServerConnectionTrackingEnabled()
           ? HasOpenConnections()
           : (!channels_.empty() || connections_open_ > 0);
-  if (has_open_connections ||
-      listeners_destroyed_ < listener_states_.size()) {
+  if (has_open_connections || listeners_destroyed_ < listener_states_.size()) {
     if (gpr_time_cmp(gpr_time_sub(gpr_now(GPR_CLOCK_REALTIME),
                                   last_shutdown_message_time_),
                      gpr_time_from_seconds(1, GPR_TIMESPAN)) >= 0) {
@@ -1674,8 +1672,8 @@ void BroadcastShutdownToConnectionsLocked(
 //    -- If the server has outstanding calls that are in the process, the
 //       connection is NOT closed until the server is done with all those calls.
 //    -- Once there are no more calls in progress, the channel is closed.
-void Server::ShutdownAndNotify(Duration grace_period,
-                               grpc_completion_queue* cq, void* tag) {
+void Server::ShutdownAndNotify(Duration grace_period, grpc_completion_queue* cq,
+                               void* tag) {
   ChannelBroadcaster broadcaster;
   {
     // Wait for startup to be finished.  Locks mu_global.
@@ -1901,7 +1899,7 @@ class Server::ChannelData::ConnectivityWatcher
 
 Server::ChannelData::~ChannelData() {
   if (server_ != nullptr) {
-// FIXME: maybe don't do this here either?
+    // FIXME: maybe don't do this here either?
     server_->stream_quota_->DecrementOpenChannels();
     if (!IsServerConnectionTrackingEnabled()) {
       MutexLock lock(server_->mu_global_);
@@ -2394,16 +2392,17 @@ void grpc_server_shutdown_and_notify(grpc_server* server,
       grpc_core::Duration::Zero(), cq, tag);
 }
 
-void grpc_server_shutdown_and_notify_with_deadline(
-    grpc_server* server, gpr_timespec deadline, grpc_completion_queue* cq,
-    void* tag) {
+void grpc_server_shutdown_and_notify_with_deadline(grpc_server* server,
+                                                   gpr_timespec deadline,
+                                                   grpc_completion_queue* cq,
+                                                   void* tag) {
   grpc_core::ExecCtx exec_ctx;
-  auto grace_period = grpc_core::Timestamp::FromTimespecRoundDown(deadline)
-                      - grpc_core::Timestamp::Now();
+  auto grace_period = grpc_core::Timestamp::FromTimespecRoundDown(deadline) -
+                      grpc_core::Timestamp::Now();
   GRPC_TRACE_LOG(api, INFO)
-      << "grpc_server_shutdown_and_notify_with_timeout(server="
-      << server << ", duration=" << grace_period.ToString()
-      << ", cq=" << cq << ", tag=" << tag << ")";
+      << "grpc_server_shutdown_and_notify_with_timeout(server=" << server
+      << ", duration=" << grace_period.ToString() << ", cq=" << cq
+      << ", tag=" << tag << ")";
   grpc_core::Server::FromC(server)->ShutdownAndNotify(grace_period, cq, tag);
 }
 

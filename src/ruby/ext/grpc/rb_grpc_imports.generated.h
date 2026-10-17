@@ -477,6 +477,9 @@ extern grpc_server_start_type grpc_server_start_import;
 typedef void(*grpc_server_shutdown_and_notify_type)(grpc_server* server, grpc_completion_queue* cq, void* tag);
 extern grpc_server_shutdown_and_notify_type grpc_server_shutdown_and_notify_import;
 #define grpc_server_shutdown_and_notify grpc_server_shutdown_and_notify_import
+typedef void(*grpc_server_shutdown_and_notify_with_deadline_type)(grpc_server* server, gpr_timespec deadline, grpc_completion_queue* cq, void* tag);
+extern grpc_server_shutdown_and_notify_with_deadline_type grpc_server_shutdown_and_notify_with_deadline_import;
+#define grpc_server_shutdown_and_notify_with_deadline grpc_server_shutdown_and_notify_with_deadline_import
 typedef void(*grpc_server_cancel_all_calls_type)(grpc_server* server);
 extern grpc_server_cancel_all_calls_type grpc_server_cancel_all_calls_import;
 #define grpc_server_cancel_all_calls grpc_server_cancel_all_calls_import
