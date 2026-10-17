@@ -144,6 +144,7 @@ EXPORTS
     grpc_server_add_http2_port
     grpc_server_start
     grpc_server_shutdown_and_notify
+    grpc_server_shutdown_and_notify_with_deadline
     grpc_server_cancel_all_calls
     grpc_server_destroy
     grpc_tracer_set_enabled

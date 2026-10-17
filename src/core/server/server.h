@@ -172,7 +172,7 @@ class Server : public ServerInterface,
     // transport.
     // Implementations are responsible for informing ListenerState about the
     // following stages of a connection -
-// FIXME: update comment
+    // FIXME: update comment
     // 1) Invoke AddLogicalConnection() on accepting a new connection. Do not
     // invoke if the connection is going to be closed immediately.
     // 2) Invoke OnHandshakeDone() (irrespective of error) once handshake is
@@ -180,7 +180,7 @@ class Server : public ServerInterface,
     // invoked.
     // 3) Invoke RemoveLogicalConnection() when the connection is closed. Do not
     // invoke if the connection was never added.
-// FIXME: remove this TODO
+    // FIXME: remove this TODO
     // TODO(yashykt): In the case where there is no config fetcher, we remove
     // the connection from our map and instead use `ChannelData` to keep track
     // of the connections. This is much cheaper (8 bytes per connection) as
@@ -428,8 +428,7 @@ class Server : public ServerInterface,
       grpc_completion_queue* cq_for_notification, void* tag_new);
 
   void ShutdownAndNotify(Duration grace_period, grpc_completion_queue* cq,
-                         void* tag)
-      ABSL_LOCKS_EXCLUDED(mu_global_, mu_call_);
+                         void* tag) ABSL_LOCKS_EXCLUDED(mu_global_, mu_call_);
 
   void CancelAllCalls() ABSL_LOCKS_EXCLUDED(mu_global_);
 

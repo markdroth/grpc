@@ -167,6 +167,7 @@ grpc_server_config_fetcher_unref_type grpc_server_config_fetcher_unref_import;
 grpc_server_add_http2_port_type grpc_server_add_http2_port_import;
 grpc_server_start_type grpc_server_start_import;
 grpc_server_shutdown_and_notify_type grpc_server_shutdown_and_notify_import;
+grpc_server_shutdown_and_notify_with_deadline_type grpc_server_shutdown_and_notify_with_deadline_import;
 grpc_server_cancel_all_calls_type grpc_server_cancel_all_calls_import;
 grpc_server_destroy_type grpc_server_destroy_import;
 grpc_tracer_set_enabled_type grpc_tracer_set_enabled_import;
@@ -458,6 +459,7 @@ void grpc_rb_load_imports(HMODULE library) {
   grpc_server_add_http2_port_import = (grpc_server_add_http2_port_type) GetProcAddress(library, "grpc_server_add_http2_port");
   grpc_server_start_import = (grpc_server_start_type) GetProcAddress(library, "grpc_server_start");
   grpc_server_shutdown_and_notify_import = (grpc_server_shutdown_and_notify_type) GetProcAddress(library, "grpc_server_shutdown_and_notify");
+  grpc_server_shutdown_and_notify_with_deadline_import = (grpc_server_shutdown_and_notify_with_deadline_type) GetProcAddress(library, "grpc_server_shutdown_and_notify_with_deadline");
   grpc_server_cancel_all_calls_import = (grpc_server_cancel_all_calls_type) GetProcAddress(library, "grpc_server_cancel_all_calls");
   grpc_server_destroy_import = (grpc_server_destroy_type) GetProcAddress(library, "grpc_server_destroy");
   grpc_tracer_set_enabled_import = (grpc_tracer_set_enabled_type) GetProcAddress(library, "grpc_tracer_set_enabled");
