@@ -265,7 +265,7 @@ class Server : public ServerInterface,
     void RemoveLogicalConnection(
         ListenerInterface::LogicalConnection* connection);
 
-// FIXME: document
+    // FIXME: document
     std::optional<ChannelArgs> AddHandshakingConnection(
         OrphanablePtr<Orphanable> handshaking_connection,
         const ChannelArgs& args, grpc_endpoint* endpoint);
@@ -291,9 +291,9 @@ class Server : public ServerInterface,
     // changing the inproc transport to use a listener and migrating
     // callers from the legacy grpc_server_add_channel_from_fd() API to
     // the new PassiveListener API, and maybe other changes.
-    absl::Status LegacyAddActiveConnection(
-        Transport* transport, grpc_pollset* accepting_pollset,
-        const ChannelArgs& args);
+    absl::Status LegacyAddActiveConnection(Transport* transport,
+                                           grpc_pollset* accepting_pollset,
+                                           const ChannelArgs& args);
 
     size_t NumOpenConnectionsLocked()
         ABSL_EXCLUSIVE_LOCKS_REQUIRED(&Server::mu_global_) {
@@ -735,9 +735,9 @@ class Server : public ServerInterface,
   void RemoveDrainingConnectionLocked(Connection* connection)
       ABSL_EXCLUSIVE_LOCKS_REQUIRED(mu_global_);
 
-  void StartDrainingConnectionLocked(
-      OrphanablePtr<Connection> connections,
-      absl::string_view reason, Duration grace_period)
+  void StartDrainingConnectionLocked(OrphanablePtr<Connection> connections,
+                                     absl::string_view reason,
+                                     Duration grace_period)
       ABSL_EXCLUSIVE_LOCKS_REQUIRED(mu_global_);
 
   void StartDrainingConnectionsLocked(

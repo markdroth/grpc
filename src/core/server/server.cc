@@ -234,9 +234,8 @@ Server::ListenerState::ListenerState(RefCountedPtr<Server> server,
 }
 
 void Server::ListenerState::Start() {
-  GRPC_TRACE_LOG(server, INFO)
-      << "[server " << server_.get() << " listener_state " << this
-      << "]: Start()";
+  GRPC_TRACE_LOG(server, INFO) << "[server " << server_.get()
+                               << " listener_state " << this << "]: Start()";
   if (listener_ != nullptr && server_->config_fetcher() != nullptr) {
     auto watcher = std::make_unique<ConfigFetcherWatcher>(this);
     config_fetcher_watcher_ = watcher.get();
@@ -258,9 +257,8 @@ void Server::ListenerState::Start() {
 }
 
 void Server::ListenerState::Stop() {
-  GRPC_TRACE_LOG(server, INFO)
-      << "[server " << server_.get() << " listener_state " << this
-      << "]: Stop()";
+  GRPC_TRACE_LOG(server, INFO) << "[server " << server_.get()
+                               << " listener_state " << this << "]: Stop()";
   absl::flat_hash_set<OrphanablePtr<ListenerInterface::LogicalConnection>>
       connections;
   if (!IsServerConnectionManagementEnabled()) {
@@ -390,8 +388,8 @@ void Server::ListenerState::RemoveLogicalConnection(
 }
 
 std::optional<ChannelArgs> Server::ListenerState::AddHandshakingConnection(
-    OrphanablePtr<Orphanable> handshaking_connection,
-    const ChannelArgs& args, grpc_endpoint* endpoint) {
+    OrphanablePtr<Orphanable> handshaking_connection, const ChannelArgs& args,
+    grpc_endpoint* endpoint) {
   GRPC_TRACE_LOG(server, INFO)
       << "[server " << server_.get() << " listener_state " << this
       << "]: AddHandshakingConnection(): handshaking_connection="
@@ -442,13 +440,14 @@ std::optional<ChannelArgs> Server::ListenerState::AddHandshakingConnection(
   return new_args;
 }
 
-bool Server::ListenerState::OnHandshakeDone(
-    Orphanable* handshaking_connection, Transport* transport,
-    grpc_pollset* accepting_pollset, const ChannelArgs& args) {
+bool Server::ListenerState::OnHandshakeDone(Orphanable* handshaking_connection,
+                                            Transport* transport,
+                                            grpc_pollset* accepting_pollset,
+                                            const ChannelArgs& args) {
   GRPC_TRACE_LOG(server, INFO)
       << "[server " << server_.get() << " listener_state " << this
-      << "]: OnHandshakeDone(handshaking_connection="
-      << handshaking_connection << ", transport=" << transport << ")";
+      << "]: OnHandshakeDone(handshaking_connection=" << handshaking_connection
+      << ", transport=" << transport << ")";
   absl::StatusOr<OrphanablePtr<ServerTransport>> owned_transport =
       server_->SetupCallLinkageForTransport(transport, accepting_pollset, args,
                                             GRPC_SERVER_CHANNEL);
@@ -533,8 +532,8 @@ void Server::ListenerState::DrainConnectionsOnConfigUpdateLocked() {
                    .value_or(Duration::Minutes(10))));
 }
 
-void Server::ListenerState::DrainConnectionsLocked(
-    absl::string_view reason, Duration grace_period) {
+void Server::ListenerState::DrainConnectionsLocked(absl::string_view reason,
+                                                   Duration grace_period) {
   GRPC_TRACE_LOG(server, INFO)
       << "[server " << server_.get() << " listener_state " << this
       << "]: DrainConnectionsLocked(reason=\"" << reason
@@ -543,8 +542,8 @@ void Server::ListenerState::DrainConnectionsLocked(
   handshaking_connections_.clear();
   // If there are any active connections, start draining them.
   if (active_connections_.empty()) return;
-  server_->StartDrainingConnectionsLocked(
-      std::move(active_connections_), reason, grace_period);
+  server_->StartDrainingConnectionsLocked(std::move(active_connections_),
+                                          reason, grace_period);
   active_connections_.clear();
 }
 
@@ -558,8 +557,7 @@ Server::ListenerState::ExtractActiveConnectionLocked(Connection* connection) {
 void Server::ListenerState::RemoveConnectionLocked(Connection* connection) {
   GRPC_TRACE_LOG(server, INFO)
       << "[server " << server_.get() << " listener_state " << this
-      << "]: RemoveConnectionLocked(connection="
-      << connection << ")";
+      << "]: RemoveConnectionLocked(connection=" << connection << ")";
   // First, check active connections.
   OrphanablePtr<Connection> owned_connection =
       ExtractActiveConnectionLocked(connection);
@@ -676,9 +674,8 @@ class Server::Connection::ConnectivityWatcher final
 // Server::Connection
 //
 
-Server::Connection::Connection(
-    RefCountedPtr<ListenerState> listener_state,
-    OrphanablePtr<ServerTransport> transport)
+Server::Connection::Connection(RefCountedPtr<ListenerState> listener_state,
+                               OrphanablePtr<ServerTransport> transport)
     : listener_state_(std::move(listener_state)),
       transport_(std::move(transport)) {
   // The caller is holding the server's mutex when creating this object,
@@ -708,8 +705,8 @@ void Server::Connection::Shutdown(absl::string_view reason,
   GRPC_TRACE_LOG(server, INFO)
       << "[server " << listener_state_->server_.get() << " listener_state "
       << listener_state_.get() << " connection " << this
-      << "]: Shutdown(reason=\"" << reason << "\", grace_period="
-      << grace_period << ")";
+      << "]: Shutdown(reason=\"" << reason
+      << "\", grace_period=" << grace_period << ")";
   MutexLock lock(listener_state_->server_->mu_global_);
   if (transport_ == nullptr) return;
   OrphanablePtr<Connection> owned_connection =
@@ -1928,9 +1925,9 @@ void Server::RemoveDrainingConnectionLocked(Connection* connection) {
   GRPC_TRACE_LOG(server, INFO) << "did NOT find draining connection";
 }
 
-void Server::StartDrainingConnectionLocked(
-    OrphanablePtr<Connection> connection,
-    absl::string_view reason, Duration grace_period) {
+void Server::StartDrainingConnectionLocked(OrphanablePtr<Connection> connection,
+                                           absl::string_view reason,
+                                           Duration grace_period) {
   absl::flat_hash_set<OrphanablePtr<Connection>> connections;
   connections.insert(std::move(connection));
   StartDrainingConnectionsLocked(std::move(connections), reason, grace_period);
@@ -1962,15 +1959,14 @@ void Server::OnDrainGraceTimer() {
   if (draining_connections_list_.empty()) return;
   connections_to_be_drained =
       std::move(draining_connections_list_.front().connections);
-// FIXME: need a better story for how these get cleaned up.  ideally
-// don't want this to happen until we get notified by the transport that
-// the connection has been closed.
+  // FIXME: need a better story for how these get cleaned up.  ideally
+  // don't want this to happen until we get notified by the transport that
+  // the connection has been closed.
   draining_connections_list_.pop_front();
   MaybeStartNewGraceTimerLocked();
   for (auto& connection : connections_to_be_drained) {
-    connection->MaybeDisconnectImmediatelyLocked(
-        absl::UnavailableError(
-            "grace time expired, server shutting down connection"));
+    connection->MaybeDisconnectImmediatelyLocked(absl::UnavailableError(
+        "grace time expired, server shutting down connection"));
   }
   MaybeFinishShutdown();
 }
@@ -1999,8 +1995,8 @@ void Server::DisconnectAllConnectionsLocked() {
 
 void Server::StartDrainingAllConnectionsLocked() {
   for (const auto& listener_state : listener_states_) {
-    listener_state->DrainConnectionsLocked(
-        "server shutting down", Duration::Infinity());
+    listener_state->DrainConnectionsLocked("server shutting down",
+                                           Duration::Infinity());
   }
 }
 
@@ -2088,14 +2084,14 @@ void Server::MaybeFinishShutdown() {
           : (!channels_.empty() || !connections_.empty());
   if (has_open_connections || listeners_destroyed_ < listener_states_.size()) {
     if (GRPC_TRACE_FLAG_ENABLED(server)) {
-      LOG(INFO)
-          << "Waiting for " << channels_.size() << " channels, "
-          << connections_.size() << " connections, "
-          << NumActiveConnectionsLocked() << " active connections, "
-          << NumDrainingConnectionsLocked() << " draining connections, and "
-          << listener_states_.size() - listeners_destroyed_ << "/"
-          << listener_states_.size()
-          << " listeners to be destroyed before shutting down server";
+      LOG(INFO) << "Waiting for " << channels_.size() << " channels, "
+                << connections_.size() << " connections, "
+                << NumActiveConnectionsLocked() << " active connections, "
+                << NumDrainingConnectionsLocked()
+                << " draining connections, and "
+                << listener_states_.size() - listeners_destroyed_ << "/"
+                << listener_states_.size()
+                << " listeners to be destroyed before shutting down server";
     } else {
       VLOG_EVERY_N_SEC(2, 1)
           << "Waiting for " << channels_.size() << " channels, "
