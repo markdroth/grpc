@@ -21,7 +21,6 @@
 #include <grpc/event_engine/event_engine.h>
 #include <grpc/slice.h>
 #include <grpc/slice_buffer.h>
-#include <grpc/support/port_platform.h>
 #include <limits.h>
 #include <stdint.h>
 #include <string.h>
@@ -82,7 +81,7 @@ class Http2SettingsHandshaker final : public Handshaker {
 
   void OnWriteDoneLocked(absl::Status error) ABSL_EXCLUSIVE_LOCKS_REQUIRED(mu_);
   void OnReadDoneLocked(absl::Status error) ABSL_EXCLUSIVE_LOCKS_REQUIRED(mu_);
-  void ReadMoreLocked() ABSL_EXCLUSIVE_LOCKS_REQUIRED(mu_);
+  void StartReadLocked() ABSL_EXCLUSIVE_LOCKS_REQUIRED(mu_);
   void HandshakeFailedLocked(absl::Status error)
       ABSL_EXCLUSIVE_LOCKS_REQUIRED(mu_);
   void MaybeFinishLocked() ABSL_EXCLUSIVE_LOCKS_REQUIRED(mu_);
@@ -118,12 +117,10 @@ void Http2SettingsHandshaker::DoHandshake(
   MutexLock lock(mu_);
   args_ = args;
   on_handshake_done_ = std::move(on_handshake_done);
-
   // Initialize local settings from channel args.
   InitLocalSettings(settings_.mutable_local(), is_client_);
   ReadSettingsFromChannelArgs(args_->args, settings_.mutable_local(),
                               is_client_);
-
   // Prepare outgoing connection preface (client only) and initial SETTINGS
   // frame.
   if (is_client_) {
@@ -135,18 +132,15 @@ void Http2SettingsHandshaker::DoHandshake(
   GRPC_CHECK(settings_frame.has_value());
   Http2Frame frame(std::move(*settings_frame));
   Serialize(absl::Span<Http2Frame>(&frame, 1), write_buffer_);
-
-  // Start asynchronous write.
-  Ref().release();  // Ref held by OnWriteDoneScheduler
+  // Start write.
   grpc_event_engine::experimental::EventEngine::Endpoint::WriteArgs write_args;
   write_args.set_max_frame_size(INT_MAX);
   grpc_endpoint_write(
       args_->endpoint.get(), write_buffer_.c_slice_buffer(),
-      GRPC_CLOSURE_INIT(&on_write_done_scheduler_,
-                        &Http2SettingsHandshaker::OnWriteDoneScheduler, this,
+      GRPC_CLOSURE_INIT(&on_write_done_scheduler_, &OnWriteDoneScheduler,
+                        Ref().release(),  // released by callback
                         grpc_schedule_on_exec_ctx),
       std::move(write_args));
-
   // Process any bytes already in args_->read_buffer and start reading if
   // needed.
   OnReadDoneLocked(absl::OkStatus());
@@ -168,7 +162,7 @@ void Http2SettingsHandshaker::OnWriteDoneScheduler(void* arg,
           MutexLock lock(self->mu_);
           self->OnWriteDoneLocked(std::move(error));
         }
-        self.reset();
+        self.reset();  // while ExecCtx in scope
       });
 }
 
@@ -193,7 +187,7 @@ void Http2SettingsHandshaker::OnReadDoneScheduler(void* arg,
           MutexLock lock(self->mu_);
           self->OnReadDoneLocked(std::move(error));
         }
-        self.reset();
+        self.reset();  // while ExecCtx in scope
       });
 }
 
@@ -218,7 +212,7 @@ void Http2SettingsHandshaker::OnReadDoneLocked(absl::Status error) {
       return;
     }
     if (len < GRPC_CHTTP2_CLIENT_CONNECT_STRLEN) {
-      ReadMoreLocked();
+      StartReadLocked();
       return;
     }
     read_buffer_.MoveFirstNBytesIntoBuffer(GRPC_CHTTP2_CLIENT_CONNECT_STRLEN,
@@ -228,7 +222,7 @@ void Http2SettingsHandshaker::OnReadDoneLocked(absl::Status error) {
   // Read and validate the 9-byte SETTINGS frame header.
   if (!frame_header_.has_value()) {
     if (read_buffer_.Length() < kFrameHeaderSize) {
-      ReadMoreLocked();
+      StartReadLocked();
       return;
     }
     uint8_t buf[kFrameHeaderSize];
@@ -266,7 +260,7 @@ void Http2SettingsHandshaker::OnReadDoneLocked(absl::Status error) {
   }
   // Wait for the full SETTINGS frame payload, then parse and apply it.
   if (read_buffer_.Length() < frame_header_->length) {
-    ReadMoreLocked();
+    StartReadLocked();
     return;
   }
   SliceBuffer payload;
@@ -292,12 +286,11 @@ void Http2SettingsHandshaker::OnReadDoneLocked(absl::Status error) {
   MaybeFinishLocked();
 }
 
-void Http2SettingsHandshaker::ReadMoreLocked() {
-  Ref().release();  // Ref held by OnReadDoneScheduler
+void Http2SettingsHandshaker::StartReadLocked() {
   grpc_endpoint_read(
       args_->endpoint.get(), args_->read_buffer.c_slice_buffer(),
-      GRPC_CLOSURE_INIT(&on_read_done_scheduler_,
-                        &Http2SettingsHandshaker::OnReadDoneScheduler, this,
+      GRPC_CLOSURE_INIT(&on_read_done_scheduler_, &OnReadDoneScheduler,
+                        Ref().release(),  // released by callback
                         grpc_schedule_on_exec_ctx),
       /*urgent=*/true, /*min_progress_size=*/1);
 }
@@ -317,8 +310,6 @@ void Http2SettingsHandshaker::HandshakeFailedLocked(absl::Status error) {
   }
   if (status_.ok()) status_ = std::move(error);
   args_->endpoint.reset();
-  read_buffer_.Clear();
-  args_->read_buffer.Clear();
   MaybeFinishLocked();
 }
 
